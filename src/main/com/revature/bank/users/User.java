@@ -3,6 +3,8 @@ package com.revature.bank.users;
 public abstract class User {
 	private final String userName;
 	private String password;
+	private String firstName;
+	private String lastName;
 	
 	/**
 	 * Constructs a user with the user name and password of userName, and password respectively.
@@ -40,6 +42,34 @@ public abstract class User {
 		this.password = password;
 		
 		return true;
+	}
+
+	/**
+	 * @return the user's first name
+	 */
+	public String getFirstName() {
+		return firstName;
+	}
+
+	/**
+	 * @param firstName the first name to set
+	 */
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	/**
+	 * @return the user's last name
+	 */
+	public String getLastName() {
+		return lastName;
+	}
+
+	/**
+	 * @param lastName the last name to set
+	 */
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
 	}
 	
 	
