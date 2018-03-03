@@ -1,33 +1,39 @@
 package com.revature.bank.accounts;
 
 public class Account {
-	private double amount;
+	private double balance;
 	
 	public Account() {
-		amount = 0;
+		balance = 0;
 	}
 
 	/**
 	 * Withdraw the amount in the bank account.
 	 * @param amount Not negative.
 	 */
-	public void withdraw(double amount) {
+	public boolean withdraw(double amount) {
 		// TODO Implement
+		return false;
 	}
 	
 	/**
 	 * Deposit the amount into the bank account.
 	 * @param amount Not negative.
 	 */
-	public void deposit(double amount) {
+	public boolean deposit(double amount) {
 		// TODO Implement
+		return false;
+	}
+	
+	public boolean transfer(double amount, Account account) {
+		return false;
 	}
 	
 	/**
 	 * @return The amount currently in the account.
 	 */
-	public double getAmount() {
-		return amount;
+	public double getBalance() {
+		return balance;
 	}
 	
 }
