@@ -1,6 +1,12 @@
 package com.revature.bank.accounts;
 
-public class Account {
+import java.io.Serializable;
+
+public class Account implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -898679925211200313L;
 	private String nickName;
 	private double balance;
 	{
@@ -30,6 +36,7 @@ public class Account {
 	}
 	
 	public boolean transfer(Account to, double amount) {
+		// TODO Implement
 		return false;
 	}
 	

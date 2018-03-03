@@ -103,7 +103,6 @@ public class CustomerTests {
 	
 	@Test
 	public void testTransferToNull() {
-		
 		expectedException.expect(NullPointerException.class);
 		customer.transfer(0, null, 0, 500);
 	}

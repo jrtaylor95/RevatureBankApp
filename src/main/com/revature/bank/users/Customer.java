@@ -6,6 +6,10 @@ import java.util.List;
 import com.revature.bank.accounts.Account;
 
 public class Customer extends User {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3179028426414747013L;
 	List<Account> accounts;
 	{
 		accounts = new ArrayList<>();
@@ -28,14 +32,17 @@ public class Customer extends User {
 	}
 	
 	public boolean withdraw(int idx, double amount) {
+		// TODO Implement
 		return false;
 	}
 	
 	public boolean deposit(int idx, double amount) {
+		// TODO Implement
 		return false;
 	}
 	
 	public boolean transfer(int fromIdx, Customer toCustomer, int toIdx, double amount) {
+		// TODO Implement
 		return false;
 	}
 }
