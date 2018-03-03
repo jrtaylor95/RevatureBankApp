@@ -1,10 +1,14 @@
 package com.revature.bank.accounts;
 
 public class Account {
+	private String nickName;
 	private double balance;
-	
-	public Account() {
+	{
 		balance = 0;
+	}
+	
+	public Account(String nickName) {
+		this.nickName = nickName;
 	}
 
 	/**
@@ -25,7 +29,7 @@ public class Account {
 		return false;
 	}
 	
-	public boolean transfer(double amount, Account account) {
+	public boolean transfer(Account to, double amount) {
 		return false;
 	}
 	
@@ -34,6 +38,14 @@ public class Account {
 	 */
 	public double getBalance() {
 		return balance;
+	}
+	
+	public String getNickName() {
+		return nickName;
+	}
+	
+	public void setNickName(String nickName) {
+		this.nickName = nickName;
 	}
 	
 }

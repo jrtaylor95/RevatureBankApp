@@ -27,6 +27,18 @@ public class Bank {
 		return null;
 	}
 	
+	public boolean withdraw(Account account, double amount) {
+		return false;
+	}
+	
+	public boolean deposit(Account account, double amount) {
+		return false;
+	}
+	
+	public boolean transfer(Account from, Account to, double amount) {
+		return false;
+	}
+	
 	
 	
 }
