@@ -79,13 +79,13 @@ public class AccountTests {
 	
 	@Test
 	public void testOverWithdraw() {
-		expectedException.expect(IllegalArgumentException.class);
+		expectedException.expect(IllegalStateException.class);
 		account.withdraw(750);
 	}
 	
 	@Test
 	public void testOverTransfer() {
-		expectedException.expect(IllegalArgumentException.class);
+		expectedException.expect(IllegalStateException.class);
 		account.transfer(transferAccount, 750);
 	}
 	

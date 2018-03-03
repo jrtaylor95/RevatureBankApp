@@ -11,8 +11,6 @@ import com.revature.bank.users.User;
 public class UserTest {
 
 	User customer;
-	User employee;
-	User admin;
 
 	@Before
 	public void setUp() throws Exception {
