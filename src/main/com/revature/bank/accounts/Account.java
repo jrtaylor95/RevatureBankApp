@@ -6,6 +6,7 @@ public class Account implements Serializable {
 	/**
 	 * 
 	 */
+	
 	private static final long serialVersionUID = -898679925211200313L;
 	private String nickName;
 	private double balance;

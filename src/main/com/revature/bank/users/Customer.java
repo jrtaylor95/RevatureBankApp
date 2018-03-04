@@ -30,19 +30,4 @@ public class Customer extends User {
 	public void addAccount(Account account) {
 		this.accounts.add(account);
 	}
-	
-	public boolean withdraw(int idx, double amount) {
-		// TODO Implement
-		return false;
-	}
-	
-	public boolean deposit(int idx, double amount) {
-		// TODO Implement
-		return false;
-	}
-	
-	public boolean transfer(int fromIdx, Customer toCustomer, int toIdx, double amount) {
-		// TODO Implement
-		return false;
-	}
 }
