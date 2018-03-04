@@ -87,4 +87,21 @@ public class Bank {
 		// TODO Implement
 		return false;
 	}
+	
+	public boolean cancelAccount(Administrator admin, String customer) {
+		// TODO Implement
+		return false;
+	}
+	
+	public void viewCustomerInformation(Employee employee, String customer) {
+		// TODO Implement
+	}
+	
+	public void approveAccount(String customer) {
+		
+	}
+	
+	public void rejectAccount(String customer) {
+		
+	}
 }
