@@ -61,9 +61,4 @@ public class Account implements Serializable {
 	public void setNickName(String nickName) {
 		this.nickName = nickName;
 	}
-	
-	public String toString() {
-		return String.format("Account %s:\n"
-				+ "Balance %.2f\n", this.nickName, this.balance);
-	}
 }

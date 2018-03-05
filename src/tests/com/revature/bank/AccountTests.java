@@ -15,7 +15,7 @@ public class AccountTests {
 	Account transferAccount;
 	
 	@Rule
-	public static ExpectedException expectedException = ExpectedException.none();
+	public ExpectedException expectedException = ExpectedException.none();
 	
 	@Before
 	public void setUp() throws Exception {
@@ -51,14 +51,7 @@ public class AccountTests {
 		assertTrue(account.withdraw(250));
 		assertEquals(250, account.getBalance(), 0);
 	}
-	
-	@Test
-	public void testTransfer() {
-		assertTrue(account.transfer(transferAccount, 250));
-		assertEquals(250, account.getBalance(), 0);
-		assertEquals(250, transferAccount.getBalance(), 0);
-	}
-	
+
 	@Test
 	public void testNegativeDeposit() {
 		expectedException.expect(IllegalArgumentException.class);
@@ -72,28 +65,8 @@ public class AccountTests {
 	}
 	
 	@Test
-	public void testNegativeTransfer() {
-		expectedException.expect(IllegalArgumentException.class);
-		account.transfer(transferAccount, -250);
-	}
-	
-	@Test
 	public void testOverWithdraw() {
 		expectedException.expect(IllegalArgumentException.class);
 		account.withdraw(750);
 	}
-	
-	@Test
-	public void testOverTransfer() {
-		expectedException.expect(IllegalStateException.class);
-		account.transfer(transferAccount, 750);
-	}
-	
-	@Test
-	public void testTransferToNullAccount() {
-		expectedException.expect(NullPointerException.class);
-		account.transfer(null, 250);
-	}
-	
-
 }
