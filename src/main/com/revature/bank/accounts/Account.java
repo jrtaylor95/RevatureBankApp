@@ -62,4 +62,8 @@ public class Account implements Serializable {
 		this.nickName = nickName;
 	}
 	
+	public String toString() {
+		return String.format("Account %s:\n"
+				+ "Balance %.2f\n", this.nickName, this.balance);
+	}
 }

@@ -10,4 +10,10 @@ public class Administrator extends Employee {
 	public Administrator(String userName, String password) {
 		super(userName, password);
 	}
+	
+	public String toString() {
+		return String.format("Employee %s\n"
+				+ "Name: %s %s\n"
+				+ "Role: Administrator", this.getUserName(), this.getFirstName(), this.getLastName());
+	}
 }

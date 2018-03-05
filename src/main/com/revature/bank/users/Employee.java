@@ -10,4 +10,10 @@ public class Employee extends User {
 	public Employee(String userName, String password) {
 		super(userName, password);
 	}
+	
+	public String toString() {
+		return String.format("Employee %s\n"
+				+ "Name: %s %s\n"
+				+ "Role: Employee", this.getUserName(), this.getFirstName(), this.getLastName());
+	}
 }

@@ -34,4 +34,14 @@ public class Customer extends User {
 	public void removeAccount(int idx) {
 		this.accounts.remove(idx);
 	}
+	
+	public String toString() {
+		String result = String.format("Customer %s:\n"
+				+ "Name: %s %s\n", this.getUserName(), this.getFirstName(), this.getLastName());
+		for (Account account : accounts) {
+			result += account.toString();
+		}
+		
+		return result;
+	}
 }

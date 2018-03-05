@@ -28,8 +28,4 @@ public class LoggingUtil {
 	public static void logTrace(String s) {
 		log.trace(s);
 	}
-	
-	public static void main(String[] args) {
-		LoggingUtil.logDebug("Debug Log");
-	}
 }
