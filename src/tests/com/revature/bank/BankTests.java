@@ -48,10 +48,37 @@ public class BankTests {
 	}
 	
 	@Test
+	public void testCustomerREgisterWithEmployee() {
+		Customer expectedCustomer = (Customer) bank.register("Admin", "Password");
+		assertNull(expectedCustomer);
+		assertEquals(1, bank.getCustomers().size());
+	}
+	
+	@Test
+	public void testCustomerRegisterWithNull() {
+		expectedException.expect(NullPointerException.class);
+		bank.register(null, "Password");
+	}
+	
+	@Test
 	public void testRegisterEmployee() {
 		Employee expectedCustomer = (Employee) bank.registerEmployee("Employee", "Password", false);
 		assertNotNull(expectedCustomer);
 		assertEquals(2, bank.getEmployees().size());
+	}
+	
+	@Test
+	public void testRegisterDuplicateEmployee() {
+		Employee expectedEmployee = (Administrator) bank.registerEmployee("Admin", "Password", true);
+		assertNull(expectedEmployee);
+		assertEquals(1, bank.getEmployees().size());
+	}
+	
+	@Test
+	public void testRegisterEmployeeWithCustomer() {
+		Employee expectedEmployee = (Administrator) bank.registerEmployee("Customer", "Password", true);
+		assertNull(expectedEmployee);
+		assertEquals(1, bank.getEmployees().size());
 	}
 	
 	@Test
@@ -68,6 +95,18 @@ public class BankTests {
 		
 		Account actualAccount = customer.getAccount(0);
 		assertEquals(1000, actualAccount.getBalance(), 0);
+	}
+	
+	@Test
+	public void testIntraUserTransfer() {
+		Account expectedTrasferAccount = new Account("Checking - 2");
+		customer.addAccount(expectedTrasferAccount);
+		
+		assertTrue(bank.transfer(customer, 0, 1, 250));
+		Account actualAccount = customer.getAccount(0);
+		Account actualTransferAccount = customer.getAccount(1);
+		assertEquals(250, actualAccount.getBalance(), 0);
+		assertEquals(250, actualTransferAccount.getBalance(), 0);
 	}
 	
 	@Test
