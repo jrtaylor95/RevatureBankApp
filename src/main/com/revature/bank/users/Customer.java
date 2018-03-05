@@ -10,7 +10,7 @@ public class Customer extends User {
 	 * 
 	 */
 	private static final long serialVersionUID = 3179028426414747013L;
-	List<Account> accounts;
+	private List<Account> accounts;
 	{
 		accounts = new ArrayList<>();
 	}
@@ -23,11 +23,15 @@ public class Customer extends User {
 		return this.accounts;
 	}
 	
-	public Account getAccount(int idx) {
+	public Account getAccount(int idx) throws IndexOutOfBoundsException {
 		return accounts.get(idx);
 	}
 	
 	public void addAccount(Account account) {
 		this.accounts.add(account);
+	}
+	
+	public void removeAccount(int idx) {
+		this.accounts.remove(idx);
 	}
 }

@@ -3,6 +3,7 @@ package com.revature.bank;
 import static org.junit.Assert.*;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
@@ -16,7 +17,9 @@ public class BankTests {
 	Bank bank;
 	private Customer customer;
 	private Administrator admin;
-	private ExpectedException expectedException = ExpectedException.none();
+	
+	@Rule
+	public ExpectedException expectedException = ExpectedException.none();
 	
 	@Before
 	public void setUp() throws Exception {
@@ -38,7 +41,7 @@ public class BankTests {
 	
 	@Test
 	public void testWithdaw() {
-		assertTrue(bank.withdraw(customer, 0, 500));
+		assertTrue(bank.withdraw(customer, 0, 250));
 		
 		Account actualAccount = customer.getAccount(0);
 		assertEquals(250, actualAccount.getBalance(), 0);
@@ -85,12 +88,12 @@ public class BankTests {
 		transferCustomer.addAccount(expectedTransferAccount);
 		
 		expectedException.expect(IllegalArgumentException.class);
-		bank.transfer(customer, 0, "Tansfer", 0, -100);
+		bank.transfer(customer, 0, "Transfer", 0, -100);
 	}
 	
 	@Test
 	public void testOverWithdraw() {
-		expectedException.expect(IllegalStateException.class);
+		expectedException.expect(IllegalArgumentException.class);
 		bank.withdraw(customer, 0, 750);
 	}
 	
@@ -100,7 +103,7 @@ public class BankTests {
 		Account expectedTransferAccount = new Account("Checking");
 		transfer.addAccount(expectedTransferAccount);
 		
-		expectedException.expect(IllegalStateException.class);
+		expectedException.expect(IllegalArgumentException.class);
 		bank.transfer(customer, 0, "Transfer", 0, 750);
 	}
 	
@@ -113,19 +116,27 @@ public class BankTests {
 	@Test 
 	public void testTransferToNoAccount() {
 		assertNotNull(bank.register("Transfer", "Password"));
-		expectedException.expect(IllegalStateException.class);
+		expectedException.expect(IndexOutOfBoundsException.class);
 		bank.transfer(customer, 0, "Transfer", 0, 500);
 	}
 	
 	@Test
-	public void testTransferOutOfBounds() {
+	public void testTransferFromOutOfBounds() {
 		Customer transferCustomer = (Customer) bank.register("Transfer", "Password");
 		Account expectedTransferAccount = new Account("Checking");
 		transferCustomer.addAccount(expectedTransferAccount);
 		
-		expectedException.expect(ArrayIndexOutOfBoundsException.class);
+		expectedException.expect(IndexOutOfBoundsException.class);
 		bank.transfer(customer, 5, "Transfer", 0, 500);
-		expectedException.expect(ArrayIndexOutOfBoundsException.class);
+	}
+	
+	@Test
+	public void testTransferToOutOfBounds() {
+		Customer transferCustomer = (Customer) bank.register("Transfer", "Password");
+		Account expectedTransferAccount = new Account("Checking");
+		transferCustomer.addAccount(expectedTransferAccount);
+		
+		expectedException.expect(IndexOutOfBoundsException.class);
 		bank.transfer(customer, 0, "Transfer", 5, 500);
 	}
 	
@@ -164,6 +175,26 @@ public class BankTests {
 		Account expectedAccount = customer.getAccount(0);
 		assertEquals(250, expectedAccount.getBalance(), 0);
 		assertEquals(250, transferAccount.getBalance(), 0);
+	}
+	
+	@Test
+	public void testCancelAccount() {
+		assertTrue(bank.cancelAccount(admin, "Customer", 0));
+		
+		assertTrue(customer.getAccounts().isEmpty());
+	}
+	
+	@Test
+	public void testCancelAccountOutOfBounds() {
+		expectedException.expect(IndexOutOfBoundsException.class);
+		bank.cancelAccount(admin, "Customer", 1);
+	}
+	
+	@Test
+	public void testCancelNull() {
+		expectedException.expect(NullPointerException.class);
+		assertFalse(bank.cancelAccount(admin, null, 0));
+		assertFalse(bank.cancelAccount(null, "Customer", 0));
 	}
 
 }

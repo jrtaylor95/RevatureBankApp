@@ -38,6 +38,10 @@ public abstract class User implements Serializable {
 		return this.password;
 	}
 	
+	public boolean checkPassword(String password) {
+		return this.password.equals(password);
+	}
+	
 	/**
 	 * Changes the password of the user to a new password.
 	 * @param password

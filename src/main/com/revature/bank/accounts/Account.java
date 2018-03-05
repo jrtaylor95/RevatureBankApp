@@ -22,18 +22,24 @@ public class Account implements Serializable {
 	 * Withdraw the amount in the bank account.
 	 * @param amount Not negative.
 	 */
-	public boolean withdraw(double amount) {
-		// TODO Implement
-		return false;
+	public boolean withdraw(double amount) throws IllegalArgumentException {
+		if (amount <= 0 || amount > balance)
+			throw new IllegalArgumentException();
+		this.balance -= amount;
+		
+		return true;
 	}
 	
 	/**
 	 * Deposit the amount into the bank account.
 	 * @param amount Not negative.
 	 */
-	public boolean deposit(double amount) {
-		// TODO Implement
-		return false;
+	public boolean deposit(double amount) throws IllegalArgumentException {
+		if (amount <= 0)
+			throw new IllegalArgumentException();
+		this.balance += amount;
+		
+		return true;
 	}
 	
 	public boolean transfer(Account to, double amount) {

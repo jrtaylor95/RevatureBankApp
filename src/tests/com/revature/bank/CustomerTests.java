@@ -13,7 +13,7 @@ import com.revature.bank.users.Customer;
 public class CustomerTests {
 
 	@Rule
-	ExpectedException expectedException = ExpectedException.none();
+	public ExpectedException expectedException = ExpectedException.none();
 	
 	Customer customer;
 	

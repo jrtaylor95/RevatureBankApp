@@ -15,7 +15,7 @@ public class AccountTests {
 	Account transferAccount;
 	
 	@Rule
-	ExpectedException expectedException = ExpectedException.none();
+	public static ExpectedException expectedException = ExpectedException.none();
 	
 	@Before
 	public void setUp() throws Exception {
@@ -79,7 +79,7 @@ public class AccountTests {
 	
 	@Test
 	public void testOverWithdraw() {
-		expectedException.expect(IllegalStateException.class);
+		expectedException.expect(IllegalArgumentException.class);
 		account.withdraw(750);
 	}
 	
