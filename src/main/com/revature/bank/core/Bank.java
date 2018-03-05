@@ -97,7 +97,7 @@ public class Bank implements Serializable {
 		}
 		
 		Employee employee = null;
-		if (isAdmin) {
+		if (!isAdmin) {
 			employee = new Employee(userName, password);
 		} else {
 			employee = new Administrator(userName, password);

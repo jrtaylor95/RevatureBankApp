@@ -11,6 +11,7 @@ import com.revature.bank.accounts.Account;
 import com.revature.bank.core.Bank;
 import com.revature.bank.users.Administrator;
 import com.revature.bank.users.Customer;
+import com.revature.bank.users.Employee;
 
 public class BankTests {
 
@@ -28,7 +29,7 @@ public class BankTests {
 		Account expectedAccount = new Account("Checking");
 		expectedAccount.deposit(500);
 		customer.addAccount(expectedAccount);
-		admin = new Administrator("Admin", "Password");
+		admin = (Administrator) bank.registerEmployee("Admin", "Password", true);
 	}
 	
 	@Test
@@ -37,6 +38,20 @@ public class BankTests {
 		assertEquals(2, bank.getCustomers().size());
 		Customer actualCustomer = (Customer) bank.logon("New Customer", "Password");
 		assertEquals(expectedCustomer, actualCustomer);
+	}
+	
+	@Test
+	public void testDuplicateRegister() {
+		Customer duplicateCustomer = (Customer) bank.register("Customer", "Password");
+		assertNull(duplicateCustomer);
+		assertEquals(1, bank.getCustomers().size());
+	}
+	
+	@Test
+	public void testRegisterEmployee() {
+		Employee expectedCustomer = (Employee) bank.registerEmployee("Employee", "Password", false);
+		assertNotNull(expectedCustomer);
+		assertEquals(2, bank.getEmployees().size());
 	}
 	
 	@Test

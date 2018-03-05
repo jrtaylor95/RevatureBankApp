@@ -329,12 +329,10 @@ public class BankDriver {
 		if (isEmployee) {
 			System.out.print("Administrator (true/false): " );
 			isAdmin = scanner.nextBoolean();
-			bank.registerEmployee(userName, password, isAdmin);
+			return bank.registerEmployee(userName, password, isAdmin);
 		} else {
-			bank.register(userName, password);
+			return bank.register(userName, password);
 		}
-		
-		return null;
 	}
 	
 	private static int accountOptions(User user) {
