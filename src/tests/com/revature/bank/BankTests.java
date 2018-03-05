@@ -232,6 +232,35 @@ public class BankTests {
 	}
 	
 	@Test
+	public void testApproveAccount() {
+		bank.apply(customer, "Checking - 2");
+		assertEquals(1, bank.getPendingAccounts().size());
+		bank.approveAccount(admin, customer.getUserName());
+		assertEquals(2, customer.getAccounts().size());
+		assertEquals(0, bank.getPendingAccounts().size());
+	}
+	
+	@Test
+	public void testApproveAccountNull() {
+		expectedException.expect(NullPointerException.class);
+		bank.approveAccount(admin, null);
+	}
+	
+	@Test
+	public void testApproveAccountNoCustomer() {
+		assertFalse(bank.approveAccount(admin, "Customer"));
+	}
+	
+	@Test
+	public void testRejectAccount() {
+		bank.apply(customer, "Checking - 2");
+		assertEquals(1, bank.getPendingAccounts().size());
+		bank.rejectAccount(admin, customer.getUserName());
+		assertEquals(1, customer.getAccounts().size());
+		assertEquals(0, bank.getPendingAccounts().size());
+	}
+	
+	@Test
 	public void testCancelAccount() {
 		assertTrue(bank.cancelAccount(admin, "Customer", 0));
 		

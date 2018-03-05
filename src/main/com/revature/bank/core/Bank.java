@@ -39,6 +39,12 @@ public class Bank implements Serializable {
 		return pendingAccounts.entrySet();
 	}
 	
+	/**
+	 * Acts as a way for a user to log in to the bank
+	 * @param userName
+	 * @param password
+	 * @return The user of the corresponding userName
+	 */
 	public User logon(String userName, String password) {
 		User user = null;
 		
@@ -65,6 +71,12 @@ public class Bank implements Serializable {
 		
 	}
 	
+	/**
+	 * Acts as a way to register a user to the bank
+	 * @param userName
+	 * @param password
+	 * @return The user of the corresponding userName
+	 */
 	public User register(String userName, String password) {
 		if (userName == null || password == null)
 			throw new NullPointerException();
@@ -84,6 +96,13 @@ public class Bank implements Serializable {
 		return customer;
 	}
 	
+	/**
+	 * Acts as a way to register an employee to the bank
+	 * @param userName
+	 * @param password
+	 * @param isAdmin
+	 * @return The user of the corresponding userName
+	 */
 	public User registerEmployee(String userName, String password, boolean isAdmin) {
 		if (userName == null || password == null)
 			throw new NullPointerException();
@@ -109,12 +128,25 @@ public class Bank implements Serializable {
 		return employee;
 	}
 	
+	/**
+	 * Allows a user to apply for an account with the nickName accountName
+	 * @param customer
+	 * @param accountName
+	 */
 	public void apply(Customer customer, String accountName) {
 		Account account = new Account(accountName);
 		pendingAccounts.put(customer.getUserName(), account);
 		LoggingUtil.logDebug(String.format("ACCOUNT_APPLICATION: User %s applied for account %s", customer.getUserName(), accountName));
 	}
 	
+	/**
+	 * Allows a user to withdraw amount from their account specified by accountIdx
+	 * @param customer
+	 * @param accountIdx
+	 * @param amount
+	 * @return
+	 * @throws IllegalArgumentException
+	 */
 	public boolean withdraw(Customer customer, int accountIdx, double amount) throws IllegalArgumentException {
 		Account account = customer.getAccount(accountIdx);
 		boolean wasSuccessful = account.withdraw(amount);
@@ -129,6 +161,14 @@ public class Bank implements Serializable {
 		return wasSuccessful;
 	}
 	
+	/**
+	 * Allows an admin to withdraw amount from a customer's account specified by accountIdx
+	 * @param admin
+	 * @param customerUserName
+	 * @param accountIdx
+	 * @param amount
+	 * @return
+	 */
 	public boolean withdraw(Administrator admin, String customerUserName, int accountIdx, double amount) {
 		Customer customer = findCustomer(customerUserName);
 		
@@ -148,6 +188,13 @@ public class Bank implements Serializable {
 		return wasSuccessful;
 	}
 	
+	/**
+	 * Allows a customer to deposit amount into their account specified by accountIdx
+	 * @param customer
+	 * @param accountIdx
+	 * @param amount
+	 * @return
+	 */
 	public boolean deposit(Customer customer, int accountIdx, double amount) {
 		Account account = customer.getAccount(accountIdx);
 		boolean wasSuccessful = account.deposit(amount);
@@ -162,6 +209,14 @@ public class Bank implements Serializable {
 		return wasSuccessful;
 	}
 	
+	/**
+	 * Allows an admin to deposit amount into a customer's account specified by accountIdx
+	 * @param admin
+	 * @param customerUserName
+	 * @param accountIdx
+	 * @param amount
+	 * @return
+	 */
 	public boolean deposit(Administrator admin, String customerUserName, int accountIdx, double amount) {
 		Customer customer = findCustomer(customerUserName);
 		
@@ -181,6 +236,14 @@ public class Bank implements Serializable {
 		return wasSuccessful;
 	}
 	
+	/**
+	 * Transfers amount from one account to another
+	 * @param fromAccount
+	 * @param toAccount
+	 * @param amount
+	 * @return
+	 * @throws IllegalArgumentException
+	 */
 	private boolean transfer(Account fromAccount, Account toAccount, double amount) throws IllegalArgumentException {
 		fromAccount.withdraw(amount);
 		toAccount.deposit(amount);
@@ -188,6 +251,12 @@ public class Bank implements Serializable {
 		return true;
 	}
 	
+	/**
+	 * Finds a customer based on a userName
+	 * @param userName
+	 * @return
+	 * @throws NullPointerException
+	 */
 	private Customer findCustomer(String userName) throws NullPointerException {
 		if (userName == null)
 			throw new NullPointerException();
@@ -195,6 +264,14 @@ public class Bank implements Serializable {
 		return customers.get(userName);
 	}
 	
+	/**
+	 * Allows a customer to transfer amount to another of their accounts
+	 * @param customer
+	 * @param fromAccountIdx
+	 * @param toAccountIdx
+	 * @param amount
+	 * @return
+	 */
 	public boolean transfer(Customer customer, int fromAccountIdx, int toAccountIdx, double amount) {
 		Account fromAccount = customer.getAccount(fromAccountIdx);
 		Account toAccount = customer.getAccount(toAccountIdx);
@@ -210,6 +287,16 @@ public class Bank implements Serializable {
 		return wasSuccessful;
 	}
 	
+	/**
+	 * Allows a customer to transfer amount to another user's account
+	 * @param fromCustomer
+	 * @param fromAccountIdx
+	 * @param toCustomerUserName
+	 * @param toAccountIdx
+	 * @param amount
+	 * @return
+	 * @throws IllegalArgumentException
+	 */
 	public boolean transfer(Customer fromCustomer, int fromAccountIdx, String toCustomerUserName, int toAccountIdx, double amount) throws IllegalArgumentException {
 		Customer toCustomer = findCustomer(toCustomerUserName);
 		
@@ -230,6 +317,15 @@ public class Bank implements Serializable {
 		return wasSuccessful;
 	}
 	
+	/**
+	 * Allows an admin to transfer amount from one user's account to another
+	 * @param admin
+	 * @param customerUserName
+	 * @param fromAccountIdx
+	 * @param toAccountIdx
+	 * @param amount
+	 * @return
+	 */
 	public boolean transfer(Administrator admin, String customerUserName, int fromAccountIdx, int toAccountIdx, double amount) {
 		Customer customer = findCustomer(customerUserName);
 		
@@ -250,6 +346,16 @@ public class Bank implements Serializable {
 		return wasSuccessful;
 	}
 	
+	/**
+	 * Allows an admin to transfer amount from one customer to another
+	 * @param admin
+	 * @param fromCustomerUserName
+	 * @param fromAccountIdx
+	 * @param toCustomerUserName
+	 * @param toAccountIdx
+	 * @param amount
+	 * @return
+	 */
 	public boolean transfer(Administrator admin, String fromCustomerUserName, int fromAccountIdx, String toCustomerUserName, int toAccountIdx, double amount) {
 		Customer fromCustomer = findCustomer(fromCustomerUserName);
 		Customer toCustomer = findCustomer(toCustomerUserName);
@@ -271,6 +377,13 @@ public class Bank implements Serializable {
 		return wasSuccessful;
 	}
 	
+	/**
+	 * Allows an admin to cancel an account
+	 * @param admin
+	 * @param customerUserName
+	 * @param accountIdx
+	 * @return
+	 */
 	public boolean cancelAccount(Administrator admin, String customerUserName, int accountIdx) {
 		if (customerUserName == null || admin == null)
 			throw new NullPointerException();
@@ -285,22 +398,34 @@ public class Bank implements Serializable {
 		return true;
 	}
 	
+	/**
+	 * Allows an employee to get customer information
+	 * @param employee
+	 * @param customerUserName
+	 * @return
+	 */
 	public String getCustomerInformation(Employee employee, String customerUserName) {
 		Customer customer = findCustomer(customerUserName);
 		
 		return customer.toString();
 	}
 	
+	/**
+	 * Allows an employee to approve an account
+	 * @param employee
+	 * @param customerUserName
+	 * @return
+	 */
 	public boolean approveAccount(Employee employee, String customerUserName) {
 		if (customerUserName == null)
 			throw new NullPointerException();
 		
-		Account account = pendingAccounts.remove(customerUserName);
-		if (account == null)
-			return false;
-		
 		Customer customer = findCustomer(customerUserName);
 		if (customer == null)
+			return false;
+		
+		Account account = pendingAccounts.remove(customerUserName);
+		if (account == null)
 			return false;
 		
 		customer.addAccount(account);
@@ -311,9 +436,19 @@ public class Bank implements Serializable {
 		return false;
 	}
 	
+	/**
+	 * Allows an employee to reject an account
+	 * @param employee
+	 * @param customerUserName
+	 * @return
+	 */
 	public boolean rejectAccount(Employee employee, String customerUserName) {
 		if (customerUserName == null)
 			throw new NullPointerException();
+		
+		Customer customer = findCustomer(customerUserName);
+		if (customer == null)
+			return false;
 		
 		Account account = pendingAccounts.remove(customerUserName);
 		if (account == null)
