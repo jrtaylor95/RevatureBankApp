@@ -41,6 +41,36 @@ public class BankTests {
 	}
 	
 	@Test
+	public void testLogonUserNameNull() {
+		expectedException.expect(NullPointerException.class);
+		bank.logon(null, "Password");
+	}
+	
+	@Test
+	public void testLogonUserPasswordNull() {
+		expectedException.expect(NullPointerException.class);
+		bank.logon("Customer", null);
+	}
+	
+	@Test
+	public void testEmployeeLogon() {
+		Administrator expectedCustomer = (Administrator) bank.logon("Admin", "Password");
+		assertNotNull(expectedCustomer);
+	}
+	
+	@Test
+	public void testLogonWrongPassword() {
+		Customer expectedCustomer = (Customer) bank.logon("Customer", "Password1");
+		assertNull(expectedCustomer);
+	}
+	
+	@Test
+	public void testInvalidLogon() {
+		Administrator expectedCustomer = (Administrator) bank.logon("Admin1", "Password");
+		assertNull(expectedCustomer);
+	}
+	
+	@Test
 	public void testDuplicateRegister() {
 		Customer duplicateCustomer = (Customer) bank.register("Customer", "Password");
 		assertNull(duplicateCustomer);
@@ -48,7 +78,7 @@ public class BankTests {
 	}
 	
 	@Test
-	public void testCustomerREgisterWithEmployee() {
+	public void testCustomerRegisterWithEmployee() {
 		Customer expectedCustomer = (Customer) bank.register("Admin", "Password");
 		assertNull(expectedCustomer);
 		assertEquals(1, bank.getCustomers().size());

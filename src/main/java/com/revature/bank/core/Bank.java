@@ -139,6 +139,13 @@ public class Bank implements Serializable {
 		LoggingUtil.logDebug(String.format("ACCOUNT_APPLICATION: User %s applied for account %s", customer.getUserName(), accountName));
 	}
 	
+	public void applyJoint(Customer customer, String jointCustomerUserName, String accountName) {
+		Account account = new Account(accountName);
+		pendingAccounts.put(customer.getUserName(), account);
+		pendingAccounts.put(jointCustomerUserName, account);
+		LoggingUtil.logDebug(String.format("ACCOUNT_APPLICATION: User %s applied for account %s", customer.getUserName(), accountName));
+	}
+	
 	/**
 	 * Allows a user to withdraw amount from their account specified by accountIdx
 	 * @param customer
