@@ -25,16 +25,16 @@ public class BankTests {
 	@Before
 	public void setUp() throws Exception {
 		bank = new Bank();
-		customer = (Customer) bank.register("Customer", "Password");
+		customer = (Customer) bank.register("Customer", "Password", "Michael", "Bluth");
 		Account expectedAccount = new Account("Checking");
 		expectedAccount.deposit(500);
 		customer.addAccount(expectedAccount);
-		admin = (Administrator) bank.registerEmployee("Admin", "Password", true);
+		admin = (Administrator) bank.registerEmployee("Admin", "Password", true,  "Gob", "Bluth");
 	}
 	
 	@Test
 	public void testRegisterLogon() {
-		Customer expectedCustomer = (Customer) bank.register("New Customer", "Password");
+		Customer expectedCustomer = (Customer) bank.register("New Customer", "Password", "Michael", "Bluth");
 		assertEquals(2, bank.getCustomers().size());
 		Customer actualCustomer = (Customer) bank.logon("New Customer", "Password");
 		assertEquals(expectedCustomer, actualCustomer);
@@ -72,14 +72,14 @@ public class BankTests {
 	
 	@Test
 	public void testDuplicateRegister() {
-		Customer duplicateCustomer = (Customer) bank.register("Customer", "Password");
+		Customer duplicateCustomer = (Customer) bank.register("Customer", "Password", "Michael", "Bluth");
 		assertNull(duplicateCustomer);
 		assertEquals(1, bank.getCustomers().size());
 	}
 	
 	@Test
 	public void testCustomerRegisterWithEmployee() {
-		Customer expectedCustomer = (Customer) bank.register("Admin", "Password");
+		Customer expectedCustomer = (Customer) bank.register("Admin", "Password", "Gob", "Bluth");
 		assertNull(expectedCustomer);
 		assertEquals(1, bank.getCustomers().size());
 	}
@@ -87,26 +87,26 @@ public class BankTests {
 	@Test
 	public void testCustomerRegisterWithNull() {
 		expectedException.expect(NullPointerException.class);
-		bank.register(null, "Password");
+		bank.register(null, "Password", "Michael", "Bluth");
 	}
 	
 	@Test
 	public void testRegisterEmployee() {
-		Employee expectedCustomer = (Employee) bank.registerEmployee("Employee", "Password", false);
+		Employee expectedCustomer = (Employee) bank.registerEmployee("Employee", "Password", true,  "Mae", "Funke");
 		assertNotNull(expectedCustomer);
 		assertEquals(2, bank.getEmployees().size());
 	}
 	
 	@Test
 	public void testRegisterDuplicateEmployee() {
-		Employee expectedEmployee = (Administrator) bank.registerEmployee("Admin", "Password", true);
+		Employee expectedEmployee = (Administrator) bank.registerEmployee("Admin", "Password", true,  "Gob", "Bluth");
 		assertNull(expectedEmployee);
 		assertEquals(1, bank.getEmployees().size());
 	}
 	
 	@Test
 	public void testRegisterEmployeeWithCustomer() {
-		Employee expectedEmployee = (Administrator) bank.registerEmployee("Customer", "Password", true);
+		Employee expectedEmployee = (Administrator) bank.registerEmployee("Customer", "Password", true, "Michael", "Bluth");
 		assertNull(expectedEmployee);
 		assertEquals(1, bank.getEmployees().size());
 	}
@@ -141,7 +141,7 @@ public class BankTests {
 	
 	@Test
 	public void testTransfer() {
-		Customer transferCustomer = (Customer) bank.register("Transfer", "Password");
+		Customer transferCustomer = (Customer) bank.register("Transfer", "Password", "Linday", "Bluth Funke");
 		Account expectedTransferAccount = new Account("Checking");
 		expectedTransferAccount.deposit(500);
 		transferCustomer.addAccount(expectedTransferAccount);
@@ -167,7 +167,7 @@ public class BankTests {
 	
 	@Test
 	public void testNegativeTransfer() {
-		Customer transferCustomer = (Customer) bank.register("Transfer", "Password");
+		Customer transferCustomer = (Customer) bank.register("Transfer", "Password", "Linday", "Bluth Funke");
 		Account expectedTransferAccount = new Account("Checking");
 		transferCustomer.addAccount(expectedTransferAccount);
 		
@@ -183,7 +183,7 @@ public class BankTests {
 	
 	@Test
 	public void testOverTransfer() {
-		Customer transfer = (Customer) bank.register("Transfer", "Password");
+		Customer transfer = (Customer) bank.register("Transfer", "Password", "Linday", "Bluth Funke");
 		Account expectedTransferAccount = new Account("Checking");
 		transfer.addAccount(expectedTransferAccount);
 		
@@ -199,14 +199,14 @@ public class BankTests {
 	
 	@Test 
 	public void testTransferToNoAccount() {
-		assertNotNull(bank.register("Transfer", "Password"));
+		assertNotNull(bank.register("Transfer", "Password", "Linday", "Bluth Funke"));
 		expectedException.expect(IndexOutOfBoundsException.class);
 		bank.transfer(customer, 0, "Transfer", 0, 500);
 	}
 	
 	@Test
 	public void testTransferFromOutOfBounds() {
-		Customer transferCustomer = (Customer) bank.register("Transfer", "Password");
+		Customer transferCustomer = (Customer) bank.register("Transfer", "Password", "Linday", "Bluth Funke");
 		Account expectedTransferAccount = new Account("Checking");
 		transferCustomer.addAccount(expectedTransferAccount);
 		
@@ -216,7 +216,7 @@ public class BankTests {
 	
 	@Test
 	public void testTransferToOutOfBounds() {
-		Customer transferCustomer = (Customer) bank.register("Transfer", "Password");
+		Customer transferCustomer = (Customer) bank.register("Transfer", "Password", "Linday", "Bluth Funke");
 		Account expectedTransferAccount = new Account("Checking");
 		transferCustomer.addAccount(expectedTransferAccount);
 		
@@ -251,7 +251,7 @@ public class BankTests {
 	
 	@Test
 	public void testAdminTransferDifferentCustomer() {
-		Customer transferCustomer = (Customer) bank.register("Transfer", "Password");
+		Customer transferCustomer = (Customer) bank.register("Transfer", "Password", "Linday", "Bluth Funke");
 		Account transferAccount = new Account("Checking");
 		transferCustomer.addAccount(transferAccount);
 		
