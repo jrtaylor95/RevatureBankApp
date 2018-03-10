@@ -2,7 +2,9 @@ package com.revature.bank.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.revature.bank.users.Customer;
@@ -30,15 +32,46 @@ public class CustomerDao implements BankDao<Customer> {
 	}
 
 	@Override
-	public Customer select(int id) {
-		// TODO Auto-generated method stub
-		return null;
+	public Customer select(int id) throws SQLException {
+		String sql = "SELECT * FROM CUSTOMER WHERE CUSTOMER_ID = ?";
+		
+		PreparedStatement statement = connection.prepareStatement(sql);
+		statement.setInt(1, id);
+		
+		ResultSet set = statement.executeQuery();
+		if (set.next())
+			return Customer.parseCustomer(set);
+		else
+			return null;
+	}
+	
+	public Customer select(String userName) throws SQLException {
+		String sql = "SELECT * FROM CUSTOMER WHERE CUSTOMER_USER_NAME = ?";
+		
+		PreparedStatement statement = connection.prepareStatement(sql);
+		statement.setString(1, userName);
+		
+		ResultSet set = statement.executeQuery();
+		if (set.next())
+			return Customer.parseCustomer(set);
+		else
+			return null;
 	}
 
 	@Override
-	public List<Customer> selectAll() {
-		// TODO Auto-generated method stub
-		return null;
+	public List<Customer> selectAll() throws SQLException {
+		List<Customer> customers = new ArrayList<>();
+		String sql = "SELECT * FROM CUSTOMER";
+		
+		PreparedStatement statement = connection.prepareStatement(sql);
+		
+		ResultSet set = statement.executeQuery();
+		
+		while (set.next()) {
+			customers.add(Customer.parseCustomer(set));
+		}
+		
+		return customers;
 	}
 
 	@Override
@@ -56,9 +89,13 @@ public class CustomerDao implements BankDao<Customer> {
 	}
 
 	@Override
-	public void delete(int id) {
-		// TODO Auto-generated method stub
+	public void delete(int id) throws SQLException {
+		String sql = "DELETE FROM CUSTOMER WHERE CUSTOMER_ID = ?";
 		
+		PreparedStatement statement = connection.prepareStatement(sql);
+		statement.setInt(1, id);
+		
+		statement.executeUpdate();
 	}
 
 }

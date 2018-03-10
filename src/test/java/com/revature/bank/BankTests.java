@@ -2,6 +2,8 @@ package com.revature.bank;
 
 import static org.junit.Assert.*;
 
+import java.sql.SQLException;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,7 +35,7 @@ public class BankTests {
 	}
 	
 	@Test
-	public void testRegisterLogon() {
+	public void testRegisterLogon() throws SQLException {
 		Customer expectedCustomer = (Customer) bank.register("New Customer", "Password", "Michael", "Bluth");
 		assertEquals(2, bank.getCustomers().size());
 		Customer actualCustomer = (Customer) bank.logon("New Customer", "Password");
@@ -71,21 +73,21 @@ public class BankTests {
 	}
 	
 	@Test
-	public void testDuplicateRegister() {
+	public void testDuplicateRegister() throws SQLException {
 		Customer duplicateCustomer = (Customer) bank.register("Customer", "Password", "Michael", "Bluth");
 		assertNull(duplicateCustomer);
 		assertEquals(1, bank.getCustomers().size());
 	}
 	
 	@Test
-	public void testCustomerRegisterWithEmployee() {
+	public void testCustomerRegisterWithEmployee() throws SQLException {
 		Customer expectedCustomer = (Customer) bank.register("Admin", "Password", "Gob", "Bluth");
 		assertNull(expectedCustomer);
 		assertEquals(1, bank.getCustomers().size());
 	}
 	
 	@Test
-	public void testCustomerRegisterWithNull() {
+	public void testCustomerRegisterWithNull() throws SQLException {
 		expectedException.expect(NullPointerException.class);
 		bank.register(null, "Password", "Michael", "Bluth");
 	}
@@ -140,7 +142,7 @@ public class BankTests {
 	}
 	
 	@Test
-	public void testTransfer() {
+	public void testTransfer() throws SQLException {
 		Customer transferCustomer = (Customer) bank.register("Transfer", "Password", "Linday", "Bluth Funke");
 		Account expectedTransferAccount = new Account("Checking");
 		expectedTransferAccount.deposit(500);
@@ -166,7 +168,7 @@ public class BankTests {
 	}
 	
 	@Test
-	public void testNegativeTransfer() {
+	public void testNegativeTransfer() throws SQLException {
 		Customer transferCustomer = (Customer) bank.register("Transfer", "Password", "Linday", "Bluth Funke");
 		Account expectedTransferAccount = new Account("Checking");
 		transferCustomer.addAccount(expectedTransferAccount);
@@ -182,7 +184,7 @@ public class BankTests {
 	}
 	
 	@Test
-	public void testOverTransfer() {
+	public void testOverTransfer() throws SQLException {
 		Customer transfer = (Customer) bank.register("Transfer", "Password", "Linday", "Bluth Funke");
 		Account expectedTransferAccount = new Account("Checking");
 		transfer.addAccount(expectedTransferAccount);
@@ -192,20 +194,20 @@ public class BankTests {
 	}
 	
 	@Test
-	public void testTransferToNull() {
+	public void testTransferToNull() throws SQLException {
 		expectedException.expect(NullPointerException.class);
 		bank.transfer(customer, 0, null, 0, 500);
 	}
 	
 	@Test 
-	public void testTransferToNoAccount() {
+	public void testTransferToNoAccount() throws SQLException {
 		assertNotNull(bank.register("Transfer", "Password", "Linday", "Bluth Funke"));
 		expectedException.expect(IndexOutOfBoundsException.class);
 		bank.transfer(customer, 0, "Transfer", 0, 500);
 	}
 	
 	@Test
-	public void testTransferFromOutOfBounds() {
+	public void testTransferFromOutOfBounds() throws SQLException {
 		Customer transferCustomer = (Customer) bank.register("Transfer", "Password", "Linday", "Bluth Funke");
 		Account expectedTransferAccount = new Account("Checking");
 		transferCustomer.addAccount(expectedTransferAccount);
@@ -215,7 +217,7 @@ public class BankTests {
 	}
 	
 	@Test
-	public void testTransferToOutOfBounds() {
+	public void testTransferToOutOfBounds() throws SQLException {
 		Customer transferCustomer = (Customer) bank.register("Transfer", "Password", "Linday", "Bluth Funke");
 		Account expectedTransferAccount = new Account("Checking");
 		transferCustomer.addAccount(expectedTransferAccount);
@@ -225,21 +227,21 @@ public class BankTests {
 	}
 	
 	@Test
-	public void testAdminWithdraw() {
+	public void testAdminWithdraw() throws SQLException {
 		assertTrue(bank.withdraw(admin, "Customer", 0, 250));
 		Account actualAccount = customer.getAccount(0);
 		assertEquals(250, actualAccount.getBalance(), 0);
 	}
 	
 	@Test
-	public void testAdminDeposit() {
+	public void testAdminDeposit() throws SQLException {
 		assertTrue(bank.deposit(admin, "Customer", 0, 250));
 		Account actualAccount = customer.getAccount(0);
 		assertEquals(750, actualAccount.getBalance(), 0);
 	}
 	
 	@Test
-	public void testAdminTransferSameCustomer() {
+	public void testAdminTransferSameCustomer() throws SQLException {
 		Account transferAccount = new Account("Checking - 2");
 		customer.addAccount(transferAccount);
 		
@@ -250,7 +252,7 @@ public class BankTests {
 	}
 	
 	@Test
-	public void testAdminTransferDifferentCustomer() {
+	public void testAdminTransferDifferentCustomer() throws SQLException {
 		Customer transferCustomer = (Customer) bank.register("Transfer", "Password", "Linday", "Bluth Funke");
 		Account transferAccount = new Account("Checking");
 		transferCustomer.addAccount(transferAccount);
@@ -262,7 +264,7 @@ public class BankTests {
 	}
 	
 	@Test
-	public void testApproveAccount() {
+	public void testApproveAccount() throws SQLException {
 		bank.apply(customer, "Checking - 2");
 		assertEquals(1, bank.getPendingAccounts().size());
 		bank.approveAccount(admin, customer.getUserName());
@@ -271,18 +273,18 @@ public class BankTests {
 	}
 	
 	@Test
-	public void testApproveAccountNull() {
+	public void testApproveAccountNull() throws SQLException {
 		expectedException.expect(NullPointerException.class);
 		bank.approveAccount(admin, null);
 	}
 	
 	@Test
-	public void testApproveAccountNoCustomer() {
+	public void testApproveAccountNoCustomer() throws SQLException {
 		assertFalse(bank.approveAccount(admin, "Customer"));
 	}
 	
 	@Test
-	public void testRejectAccount() {
+	public void testRejectAccount() throws SQLException {
 		bank.apply(customer, "Checking - 2");
 		assertEquals(1, bank.getPendingAccounts().size());
 		bank.rejectAccount(admin, customer.getUserName());
@@ -291,20 +293,20 @@ public class BankTests {
 	}
 	
 	@Test
-	public void testCancelAccount() {
+	public void testCancelAccount() throws SQLException {
 		assertTrue(bank.cancelAccount(admin, "Customer", 0));
 		
 		assertTrue(customer.getAccounts().isEmpty());
 	}
 	
 	@Test
-	public void testCancelAccountOutOfBounds() {
+	public void testCancelAccountOutOfBounds() throws SQLException {
 		expectedException.expect(IndexOutOfBoundsException.class);
 		bank.cancelAccount(admin, "Customer", 1);
 	}
 	
 	@Test
-	public void testCancelNull() {
+	public void testCancelNull() throws SQLException {
 		expectedException.expect(NullPointerException.class);
 		assertFalse(bank.cancelAccount(admin, null, 0));
 		assertFalse(bank.cancelAccount(null, "Customer", 0));

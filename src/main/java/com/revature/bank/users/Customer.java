@@ -1,6 +1,7 @@
 package com.revature.bank.users;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,8 +17,14 @@ public class Customer extends User {
 		accounts = new ArrayList<>();
 	}
 	
-	public static Customer parseCustomer(ResultSet set) {
+	public static Customer parseCustomer(ResultSet set) throws SQLException {
 		Customer customer = new Customer();
+
+		customer.setID(set.getInt(1));
+		customer.setUserName(set.getString(2));
+		customer.setFirstName(set.getString(3));
+		customer.setLastName(set.getString(4));
+		customer.setPassword(set.getString(5));
 		
 		return customer;
 	}

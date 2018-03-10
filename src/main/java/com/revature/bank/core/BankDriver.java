@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Scanner;
 
@@ -16,147 +17,159 @@ import com.revature.bank.users.Employee;
 import com.revature.bank.users.User;
 
 public class BankDriver {
-	
+
 	private static Scanner scanner;
 	private static Bank bank;
 	private static User currentUser;
 	private static boolean run = true;
-	
-	
+
+
 	public static void main(String[] args) {
 		scanner = new Scanner(System.in);
-		
+
 		bank = init();
-		while (run) {
-			if (currentUser == null)
-				currentUser = askLogon();
-			else {
-				int option = accountOptions(currentUser);
-				switch (option) {
-				case 1:
-					viewMyInformation();
-					break;
-				case 2:
-					withdraw();
-					break;
-				case 3:
-					deposit();
-					break;
-				case 4:
-					transferBetweenAccounts();
-					break;
-				case 5:
-					transferBetweenUsers();
-					break;
-				case 6:
-					openAccount();
-					break;
-				case 7:
-					exit();
-					break;
-				case 8:
-					viewCustomers();
-					break;
-				case 9:
-					viewCustomerInformation();
-					break;
-				case 10:
-					approveAccount();
-					break;
-				case 11:
-					rejectAccount();
-					break;
-				case 12:
-					cancelAccount();
-					break;
-				case 13:
-					withdrawAdmin();
-					break;
-				case 14:
-					depositAdmin();
-					break;
-				case 15:
-					transferBetweenAccountsAdmin();
-					break;
-				case 16:
-					transferBetweenUsersAdmin();
-					break;
-				case 17:
-					exit();
-					break;
-				case 18:
-					viewCustomers();
-					break;
-				case 19:
-					viewCustomerInformation();
-					break;
-				case 20:
-					approveAccount();
-					break;
-				case 21:
-					rejectAccount();
-					break;
-				case 22:
-					exit();
-					break;
+
+		try {
+			while (run) {
+				if (currentUser == null)
+					currentUser = askLogon();
+				else {
+					int option = accountOptions(currentUser);
+					switch (option) {
+					case 1:
+						viewMyInformation();
+						break;
+					case 2:
+						withdraw();
+						break;
+					case 3:
+						deposit();
+						break;
+					case 4:
+						transferBetweenAccounts();
+						break;
+					case 5:
+						transferBetweenUsers();
+						break;
+					case 6:
+						openAccount();
+						break;
+					case 7:
+						exit();
+						break;
+					case 8:
+						viewCustomers();
+						break;
+					case 9:
+						viewCustomerInformation();
+						break;
+					case 10:
+						approveAccount();
+						break;
+					case 11:
+						rejectAccount();
+						break;
+					case 12:
+						cancelAccount();
+						break;
+					case 13:
+						withdrawAdmin();
+						break;
+					case 14:
+						depositAdmin();
+						break;
+					case 15:
+						transferBetweenAccountsAdmin();
+						break;
+					case 16:
+						transferBetweenUsersAdmin();
+						break;
+					case 17:
+						exit();
+						break;
+					case 18:
+						viewCustomers();
+						break;
+					case 19:
+						viewCustomerInformation();
+						break;
+					case 20:
+						approveAccount();
+						break;
+					case 21:
+						rejectAccount();
+						break;
+					case 22:
+						exit();
+						break;
+					}
 				}
 			}
+		} catch (SQLException e) {
+			System.out.printf("Something went wrong (%s)\n", e.getMessage());
 		}
 	}
-	
+
 	private static void viewMyInformation() {
 		System.out.println(((Customer) currentUser).toString());
 	}
-	
-	private static void viewCustomerInformation() {
+
+	private static void viewCustomerInformation() throws SQLException {
 		System.out.println("User: ");
 		String customerUserName = scanner.next();
-		System.out.println(bank.getCustomerInformation((Employee) currentUser, customerUserName));
+		String info = bank.getCustomerInformation((Employee) currentUser, customerUserName);
+
+		if (info != null)
+			System.out.println(info);
+		else {
+			System.out.printf("User %s does not exist!%n", customerUserName);
+			viewCustomerInformation();
+		}
 	}
-	
+
 	private static void viewCustomers() {
 		Collection<Customer> customers = bank.getCustomers();
-		
+
 		System.out.println("Customers");
 		for (Customer customer : customers) {
 			System.out.printf("Username: %s Name: %s %s", customer.getUserName(), customer.getFirstName(), customer.getLastName());
 		}
 	}
-	
+
 	private static void openAccount() {
 		System.out.print("Account name: ");
 		String accountName = scanner.next();
-		
+
 		bank.apply((Customer) currentUser, accountName);
 	}
-	
-	private static void approveAccount() {
+
+	private static void approveAccount() throws SQLException {
 		System.out.print("From user: ");
 		String user = scanner.next();
-		
+
 		bank.approveAccount((Employee) currentUser, user); 
 	}
-	
-	private static void rejectAccount() {
+
+	private static void rejectAccount() throws SQLException {
 		System.out.print("From user: ");
 		String user = scanner.next();
-		
+
 		bank.rejectAccount((Employee) currentUser, user);
 	}
-	
-	private static void cancelAccount() {
+
+	private static void cancelAccount() throws SQLException {
 		System.out.print("From user: ");
 		String user = scanner.next();
-		
+
 		int idx = 0;
 		for (Account account: ((Customer) currentUser).getAccounts()) {
 			System.out.printf("%d." + account.toString(), ++idx);
 		}
 		int accountIdx = scanner.nextInt();
-		
+
 		bank.cancelAccount((Administrator) currentUser, user, accountIdx);
 	}
-	
+
 	private static void withdraw() {
 		System.out.print("From account: \n");
 		int idx = 0;
@@ -168,8 +181,8 @@ public class BankDriver {
 		double amount = scanner.nextDouble();
 		bank.withdraw((Customer) currentUser, option, amount);
 	}
-	
-	private static void withdrawAdmin() {
+
+	private static void withdrawAdmin() throws SQLException {
 		System.out.println("From user: ");
 		String user = scanner.next();
 		System.out.print("From account: ");
@@ -178,7 +191,7 @@ public class BankDriver {
 		double amount = scanner.nextDouble();
 		bank.withdraw((Administrator) currentUser, user, option, amount);
 	}
-	
+
 	private static void deposit() {
 		System.out.print("From account: \n");
 		int idx = 0;
@@ -190,8 +203,8 @@ public class BankDriver {
 		double amount = scanner.nextDouble();
 		bank.deposit((Customer) currentUser, option, amount);
 	}
-	
-	private static void depositAdmin() {
+
+	private static void depositAdmin() throws SQLException {
 		System.out.println("From user: ");
 		String user = scanner.next();
 		System.out.print("From account: ");
@@ -200,7 +213,7 @@ public class BankDriver {
 		double amount = scanner.nextDouble();
 		bank.deposit((Administrator) currentUser, user, option, amount);
 	}
-	
+
 	private static void transferBetweenAccounts() {
 		int idx = 0;
 		for (Account account: ((Customer) currentUser).getAccounts()) {
@@ -214,8 +227,8 @@ public class BankDriver {
 		double amount = scanner.nextDouble();
 		bank.transfer((Customer) currentUser, fromAccount, toAccount, amount);
 	}
-	
-	private static void transferBetweenAccountsAdmin() {
+
+	private static void transferBetweenAccountsAdmin() throws SQLException {
 		System.out.println("From user: ");
 		String user = scanner.next();
 		System.out.print("From account: ");
@@ -226,8 +239,8 @@ public class BankDriver {
 		double amount = scanner.nextDouble();
 		bank.transfer((Administrator) currentUser, user, fromAccount, toAccount, amount);
 	}
-	
-	private static void transferBetweenUsers() {
+
+	private static void transferBetweenUsers() throws SQLException {
 		int idx = 0;
 		for (Account account: ((Customer) currentUser).getAccounts()) {
 			System.out.printf("%d." + account.toString(), ++idx);
@@ -240,10 +253,16 @@ public class BankDriver {
 		int toAccount = scanner.nextInt() - 1;
 		System.out.println("Amount: ");
 		double amount = scanner.nextDouble();
-		bank.transfer((Customer) currentUser, fromAccount, toUser, toAccount, amount);
+
+		try {
+			bank.transfer((Customer) currentUser, fromAccount, toUser, toAccount, amount);
+		} catch (IllegalArgumentException e) {
+			System.out.println("Invalid command!");
+			transferBetweenUsers();
+		}
 	}
-	
-	private static void transferBetweenUsersAdmin() {
+
+	private static void transferBetweenUsersAdmin() throws SQLException {
 		System.out.println("From user: ");
 		String user = scanner.next();
 		System.out.print("From account: ");
@@ -254,12 +273,13 @@ public class BankDriver {
 		int toAccount = scanner.nextInt() - 1;
 		System.out.println("Amount: ");
 		double amount = scanner.nextDouble();
+
 		bank.transfer((Administrator) currentUser, user, fromAccount, toUser, toAccount, amount);
 	}
-	
+
 	private static Bank init() {
 		Bank bank = null;
-		
+
 		try (ObjectInputStream stream = new ObjectInputStream(new FileInputStream("bank.dat"))) {
 			bank = (Bank) stream.readObject();
 		} catch (FileNotFoundException e) {
@@ -271,13 +291,13 @@ public class BankDriver {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		if (bank == null)
 			return new Bank();
 		else
 			return bank;
 	}
-	
+
 	private static void exit() {
 		try (ObjectOutputStream stream = new ObjectOutputStream(new FileOutputStream("bank.dat"))) {
 			stream.writeObject(bank);
@@ -290,14 +310,14 @@ public class BankDriver {
 		}
 		run = false;
 	}
-	
-	private static User askLogon() {
+
+	private static User askLogon() throws SQLException {
 		System.out.println("Choose an option:\n"
 				+ "\t1. Log In\n"
 				+ "\t2. Register\n"
 				+ "\t3. Register Employee\n");
 		int option = scanner.nextInt();
-		
+
 		switch (option) {
 		case 1:
 			return logon();
@@ -306,20 +326,20 @@ public class BankDriver {
 		case 3:
 			return register(true);
 		}
-		
+
 		return null;
 	}
-	
+
 	private static User logon() {
 		System.out.print("User Name: ");
 		String userName = scanner.next();
 		System.out.println("Password: ");
 		String password = scanner.next();
-		
+
 		return bank.logon(userName, password);
 	}
-	
-	private static User register(boolean isEmployee) {
+
+	private static User register(boolean isEmployee) throws SQLException {
 		System.out.print("User Name: ");
 		String userName = scanner.next();
 		System.out.print("Password: ");
@@ -329,7 +349,7 @@ public class BankDriver {
 		System.out.print("Last Name: ");
 		String lastName = scanner.next();
 		boolean isAdmin = false;
-		
+
 		if (isEmployee) {
 			System.out.print("Administrator (true/false): " );
 			isAdmin = scanner.nextBoolean();
@@ -338,7 +358,7 @@ public class BankDriver {
 			return bank.register(userName, password, firstName, lastName);
 		}
 	}
-	
+
 	private static int accountOptions(User user) {
 		int offset = 0;
 		if (user instanceof Customer) {
@@ -373,7 +393,7 @@ public class BankDriver {
 			offset = 17;
 		}
 		int option = scanner.nextInt();
-		
+
 		return option + offset;
 	}
 

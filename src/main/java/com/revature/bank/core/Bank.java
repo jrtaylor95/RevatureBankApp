@@ -1,5 +1,7 @@
 package com.revature.bank.core;
 import java.io.Serializable;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -7,10 +9,12 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import com.revature.bank.accounts.Account;
+import com.revature.bank.dao.CustomerDao;
 import com.revature.bank.users.Administrator;
 import com.revature.bank.users.Customer;
 import com.revature.bank.users.Employee;
 import com.revature.bank.users.User;
+import com.revature.util.ConnectionFactory;
 import com.revature.util.LoggingUtil;
 
 public class Bank implements Serializable {
@@ -18,10 +22,14 @@ public class Bank implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1647119949555847865L;
+	private Connection connection;
+	private CustomerDao customerDao;
 	private Map<String, Customer> customers;
 	private Map<String, Employee> employees;
 	private Map<String, Account> pendingAccounts;
 	{
+		connection = ConnectionFactory.getInstance().getConnection();
+		customerDao = new CustomerDao(connection);
 		customers = new HashMap<>();
 		employees = new HashMap<>();
 		pendingAccounts = new TreeMap<>();
@@ -76,15 +84,13 @@ public class Bank implements Serializable {
 	 * @param userName
 	 * @param password
 	 * @return The user of the corresponding userName
+	 * @throws SQLException 
 	 */
-	public User register(String userName, String password, String firstName, String lastName) {
+	public User register(String userName, String password, String firstName, String lastName) throws SQLException {
 		if (userName == null || password == null)
 			throw new NullPointerException();
 		
-		if (customers.containsKey(userName)) {
-			LoggingUtil.logError(String.format("REGISTER: Duplicate username %s", userName));
-			return null;
-		} else if (employees.containsKey(userName)) {
+		if (customers.containsKey(userName) || employees.containsKey(userName)) {
 			LoggingUtil.logError(String.format("REGISTER: Duplicate username %s", userName));
 			return null;
 		}
@@ -92,8 +98,15 @@ public class Bank implements Serializable {
 		Customer customer = new Customer(userName, password);
 		customer.setFirstName(firstName);
 		customer.setLastName(lastName);
-		customers.put(userName, customer);
-		LoggingUtil.logDebug(String.format("REGISTER: Successful registration for user %s", userName));
+		
+		try {
+			customerDao.create(customer);
+			LoggingUtil.logDebug(String.format("REGISTER: Successful registration for user %s", userName));
+		} catch (SQLException e) {
+			LoggingUtil.logError(String.format("REGISTER: Unsuccessful registration for user %s (%s)", userName, e.getMessage()));
+			throw e;
+		}
+//		customers.put(userName, customer);
 		
 		return customer;
 	}
@@ -179,8 +192,10 @@ public class Bank implements Serializable {
 	 * @param accountIdx
 	 * @param amount
 	 * @return
+	 * @throws SQLException 
+	 * @throws NullPointerException 
 	 */
-	public boolean withdraw(Administrator admin, String customerUserName, int accountIdx, double amount) {
+	public boolean withdraw(Administrator admin, String customerUserName, int accountIdx, double amount) throws NullPointerException, SQLException {
 		Customer customer = findCustomer(customerUserName);
 		
 		if (customer == null)
@@ -227,8 +242,10 @@ public class Bank implements Serializable {
 	 * @param accountIdx
 	 * @param amount
 	 * @return
+	 * @throws SQLException 
+	 * @throws NullPointerException 
 	 */
-	public boolean deposit(Administrator admin, String customerUserName, int accountIdx, double amount) {
+	public boolean deposit(Administrator admin, String customerUserName, int accountIdx, double amount) throws NullPointerException, SQLException {
 		Customer customer = findCustomer(customerUserName);
 		
 		if (customer == null)
@@ -267,12 +284,13 @@ public class Bank implements Serializable {
 	 * @param userName
 	 * @return
 	 * @throws NullPointerException
+	 * @throws SQLException 
 	 */
-	private Customer findCustomer(String userName) throws NullPointerException {
+	private Customer findCustomer(String userName) throws NullPointerException, SQLException {
 		if (userName == null)
 			throw new NullPointerException();
 		
-		return customers.get(userName);
+		return customerDao.select(userName);
 	}
 	
 	/**
@@ -308,7 +326,7 @@ public class Bank implements Serializable {
 	 * @return
 	 * @throws IllegalArgumentException
 	 */
-	public boolean transfer(Customer fromCustomer, int fromAccountIdx, String toCustomerUserName, int toAccountIdx, double amount) throws IllegalArgumentException {
+	public boolean transfer(Customer fromCustomer, int fromAccountIdx, String toCustomerUserName, int toAccountIdx, double amount) throws IllegalArgumentException, SQLException {
 		Customer toCustomer = findCustomer(toCustomerUserName);
 		
 		if (toCustomer == null)
@@ -337,7 +355,7 @@ public class Bank implements Serializable {
 	 * @param amount
 	 * @return
 	 */
-	public boolean transfer(Administrator admin, String customerUserName, int fromAccountIdx, int toAccountIdx, double amount) {
+	public boolean transfer(Administrator admin, String customerUserName, int fromAccountIdx, int toAccountIdx, double amount) throws SQLException {
 		Customer customer = findCustomer(customerUserName);
 		
 		if (customer == null)
@@ -367,7 +385,7 @@ public class Bank implements Serializable {
 	 * @param amount
 	 * @return
 	 */
-	public boolean transfer(Administrator admin, String fromCustomerUserName, int fromAccountIdx, String toCustomerUserName, int toAccountIdx, double amount) {
+	public boolean transfer(Administrator admin, String fromCustomerUserName, int fromAccountIdx, String toCustomerUserName, int toAccountIdx, double amount) throws SQLException {
 		Customer fromCustomer = findCustomer(fromCustomerUserName);
 		Customer toCustomer = findCustomer(toCustomerUserName);
 		
@@ -395,7 +413,7 @@ public class Bank implements Serializable {
 	 * @param accountIdx
 	 * @return
 	 */
-	public boolean cancelAccount(Administrator admin, String customerUserName, int accountIdx) {
+	public boolean cancelAccount(Administrator admin, String customerUserName, int accountIdx) throws SQLException {
 		if (customerUserName == null || admin == null)
 			throw new NullPointerException();
 		
@@ -415,10 +433,14 @@ public class Bank implements Serializable {
 	 * @param customerUserName
 	 * @return
 	 */
-	public String getCustomerInformation(Employee employee, String customerUserName) {
+	public String getCustomerInformation(Employee employee, String customerUserName) throws SQLException {
 		Customer customer = findCustomer(customerUserName);
 		
+		if (customer == null)
+			return null;
+		
 		return customer.toString();
+		
 	}
 	
 	/**
@@ -427,7 +449,7 @@ public class Bank implements Serializable {
 	 * @param customerUserName
 	 * @return
 	 */
-	public boolean approveAccount(Employee employee, String customerUserName) {
+	public boolean approveAccount(Employee employee, String customerUserName) throws SQLException {
 		if (customerUserName == null)
 			throw new NullPointerException();
 		
@@ -453,7 +475,7 @@ public class Bank implements Serializable {
 	 * @param customerUserName
 	 * @return
 	 */
-	public boolean rejectAccount(Employee employee, String customerUserName) {
+	public boolean rejectAccount(Employee employee, String customerUserName) throws SQLException {
 		if (customerUserName == null)
 			throw new NullPointerException();
 		

@@ -92,4 +92,8 @@ public abstract class User implements Serializable {
 	public int getID() {
 		return this.id;
 	}
+	
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
 }
