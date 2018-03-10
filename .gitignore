@@ -12,6 +12,7 @@
 **/bin/
 **/META-INF/**
 **/jars/
+**/.m2/
 #Eclipse
 **/.metadata
 **/.project
