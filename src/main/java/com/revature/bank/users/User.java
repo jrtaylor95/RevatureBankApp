@@ -7,10 +7,13 @@ public abstract class User implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 4552266511648650843L;
-	private final String userName;
+	private int id;
+	private String userName;
 	private String password;
 	private String firstName;
 	private String lastName;
+	
+	public User() {};
 	
 	/**
 	 * Constructs a user with the user name and password of userName, and password respectively.
@@ -58,7 +61,7 @@ public abstract class User implements Serializable {
 	 * @return the user's first name
 	 */
 	public String getFirstName() {
-		return firstName;
+		return this.firstName;
 	}
 
 	/**
@@ -72,7 +75,7 @@ public abstract class User implements Serializable {
 	 * @return the user's last name
 	 */
 	public String getLastName() {
-		return lastName;
+		return this.lastName;
 	}
 
 	/**
@@ -80,5 +83,13 @@ public abstract class User implements Serializable {
 	 */
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
+	}
+	
+	public void setID(int id) {
+		this.id = id;
+	}
+	
+	public int getID() {
+		return this.id;
 	}
 }

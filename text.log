@@ -2721,3 +2721,233 @@
 2018-03-06 13:32:06 DEBUG root:25 - REGISTER: Successful registration for user Customer
 2018-03-06 13:32:06 DEBUG root:25 - REGISTER: Successful registration for user Admin
 2018-03-06 13:32:06 ERROR root:13 - REGISTER: Duplicate username Customer
+2018-03-07 09:21:46 DEBUG root:25 - REGISTER: Successful registration for user customer
+2018-03-07 09:23:37 DEBUG root:25 - ACCOUNT_APPLICATION: User customer applied for account checking
+2018-03-07 09:24:07 ERROR root:13 - REGISTER: Duplicate username customer
+2018-03-07 09:24:16 DEBUG root:25 - REGISTER: Successful registration for user admin
+2018-03-07 09:25:53 DEBUG root:25 - LOGON: Unsuccessful log in attempt for user Customer
+2018-03-07 09:26:03 DEBUG root:25 - LOGON: Unsuccessful log in attempt for user Customer
+2018-03-07 09:26:08 DEBUG root:25 - LOGON: Successful log in attempt for user customer
+2018-03-07 09:27:22 DEBUG root:25 - REGISTER: Successful registration for user customer
+2018-03-07 09:27:32 DEBUG root:25 - ACCOUNT_APPLICATION: User customer applied for account checking
+2018-03-07 09:27:50 DEBUG root:25 - REGISTER: Successful registration for user admin
+2018-03-07 09:28:02 DEBUG root:25 - APPROVE_ACCOUNT: Employee admin approved user customer account checking
+2018-03-07 09:28:14 DEBUG root:25 - LOGON: Successful log in attempt for user customer
+2018-03-07 09:29:39 DEBUG root:25 - LOGON: Successful log in attempt for user customer
+2018-03-07 09:29:48 DEBUG root:25 - DEPOSIT: Customer customer successfully deposited $500.00 to account checking
+2018-03-07 09:31:45 DEBUG root:25 - WITHDRAW: Customer customer successfully withdrawed $500.00 from account checking
+2018-03-07 09:57:15 DEBUG root:25 - REGISTER: Successful registration for user transfer
+2018-03-07 09:57:22 DEBUG root:25 - ACCOUNT_APPLICATION: User transfer applied for account checking
+2018-03-07 09:57:37 DEBUG root:25 - REGISTER: Successful registration for user admin
+2018-03-07 09:57:42 DEBUG root:25 - APPROVE_ACCOUNT: Employee admin approved user transfer account checking
+2018-03-07 09:58:31 DEBUG root:25 - LOGON: Successful log in attempt for user transfer
+2018-03-07 09:58:45 DEBUG root:25 - DEPOSIT: Customer transfer successfully deposited $500.00 to account checking
+2018-03-07 10:43:35 DEBUG root:25 - REGISTER: Successful registration for user customer
+2018-03-07 10:44:18 DEBUG root:25 - ACCOUNT_APPLICATION: User customer applied for account checking
+2018-03-07 10:44:41 DEBUG root:25 - LOGON: Successful log in attempt for user admin
+2018-03-07 10:45:05 DEBUG root:25 - APPROVE_ACCOUNT: Employee admin approved user customer account checking
+2018-03-07 10:45:17 DEBUG root:25 - LOGON: Successful log in attempt for user customer
+2018-03-07 10:45:36 DEBUG root:25 - DEPOSIT: Customer customer successfully deposited $500.00 to account checking
+2018-03-07 10:45:45 DEBUG root:25 - WITHDRAW: Customer customer successfully withdrawed $250.00 from account checking
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-07 12:28:15 DEBUG root:25 - DEPOSIT: Administrator Admin successfully deposited $250.00 to user Customer account Checking
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Transfer
+2018-03-07 12:28:15 DEBUG root:25 - TRANSFER: Administrator Admin successfully transfered $250.00 from user Customer account Checking to user Transfer account Checking
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-07 12:28:15 DEBUG root:25 - ACCOUNT_APPLICATION: User Customer applied for account Checking - 2
+2018-03-07 12:28:15 DEBUG root:25 - APPROVE_ACCOUNT: Employee Admin approved user Customer account Checking - 2
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Transfer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-07 12:28:15 DEBUG root:25 - WITHDRAW: Administrator Admin successfully withdrawed $250.00 from user Customer account Checking
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Transfer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-07 12:28:15 ERROR root:13 - REGISTER: Duplicate username Customer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-07 12:28:15 DEBUG root:25 - LOGON: Successful log in attempt for user Admin
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Employee
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Transfer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user New Customer
+2018-03-07 12:28:15 DEBUG root:25 - LOGON: Successful log in attempt for user New Customer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-07 12:28:15 ERROR root:13 - REGISTER: Duplicate username Admin
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-07 12:28:15 DEBUG root:25 - WITHDRAW: Customer Customer successfully withdrawed $250.00 from account Checking
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-07 12:28:15 DEBUG root:25 - LOGON: Unsuccessful log in attempt for user Customer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-07 12:28:15 DEBUG root:25 - ACCOUNT_APPLICATION: User Customer applied for account Checking - 2
+2018-03-07 12:28:15 DEBUG root:25 - REJECT_ACCOUNT: Employee Admin rejected user Customer account Checking - 2
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-07 12:28:15 ERROR root:13 - REGISTER: Duplicate username Admin
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-07 12:28:15 DEBUG root:25 - TRANSFER: Administrator Admin successfully transfered $250.00 from user Customer account Checking to account Checking - 2
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-07 12:28:15 DEBUG root:25 - DEPOSIT: Customer Customer successfully deposited $500.00 to account Checking
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-07 12:28:15 DEBUG root:25 - TRANSFER: User Customer successfully transfered $250.00 from account Checking to account Checking - 2
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Transfer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Transfer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Transfer
+2018-03-07 12:28:15 DEBUG root:25 - TRANSFER: User Customer successfully transfered $250.00 from account Checking to user Transfer account Checking
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-07 12:28:15 DEBUG root:25 - CANCEL_ACCOUNT: Adminsitrator Admin canceled user Customer account Checking
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-07 12:28:15 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-07 12:28:15 ERROR root:13 - REGISTER: Duplicate username Customer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-08 10:41:58 DEBUG root:25 - DEPOSIT: Administrator Admin successfully deposited $250.00 to user Customer account Checking
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Transfer
+2018-03-08 10:41:58 DEBUG root:25 - TRANSFER: Administrator Admin successfully transfered $250.00 from user Customer account Checking to user Transfer account Checking
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-08 10:41:58 DEBUG root:25 - ACCOUNT_APPLICATION: User Customer applied for account Checking - 2
+2018-03-08 10:41:58 DEBUG root:25 - APPROVE_ACCOUNT: Employee Admin approved user Customer account Checking - 2
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Transfer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-08 10:41:58 DEBUG root:25 - WITHDRAW: Administrator Admin successfully withdrawed $250.00 from user Customer account Checking
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Transfer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-08 10:41:58 ERROR root:13 - REGISTER: Duplicate username Customer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-08 10:41:58 DEBUG root:25 - LOGON: Successful log in attempt for user Admin
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Employee
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Transfer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user New Customer
+2018-03-08 10:41:58 DEBUG root:25 - LOGON: Successful log in attempt for user New Customer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-08 10:41:58 ERROR root:13 - REGISTER: Duplicate username Admin
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-08 10:41:58 DEBUG root:25 - WITHDRAW: Customer Customer successfully withdrawed $250.00 from account Checking
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-08 10:41:58 DEBUG root:25 - LOGON: Unsuccessful log in attempt for user Customer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-08 10:41:58 DEBUG root:25 - ACCOUNT_APPLICATION: User Customer applied for account Checking - 2
+2018-03-08 10:41:58 DEBUG root:25 - REJECT_ACCOUNT: Employee Admin rejected user Customer account Checking - 2
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-08 10:41:58 ERROR root:13 - REGISTER: Duplicate username Admin
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-08 10:41:58 DEBUG root:25 - TRANSFER: Administrator Admin successfully transfered $250.00 from user Customer account Checking to account Checking - 2
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-08 10:41:58 DEBUG root:25 - DEPOSIT: Customer Customer successfully deposited $500.00 to account Checking
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-08 10:41:58 DEBUG root:25 - TRANSFER: User Customer successfully transfered $250.00 from account Checking to account Checking - 2
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Transfer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Transfer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Transfer
+2018-03-08 10:41:58 DEBUG root:25 - TRANSFER: User Customer successfully transfered $250.00 from account Checking to user Transfer account Checking
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-08 10:41:58 DEBUG root:25 - CANCEL_ACCOUNT: Adminsitrator Admin canceled user Customer account Checking
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Customer
+2018-03-08 10:41:58 DEBUG root:25 - REGISTER: Successful registration for user Admin
+2018-03-08 10:41:58 ERROR root:13 - REGISTER: Duplicate username Customer

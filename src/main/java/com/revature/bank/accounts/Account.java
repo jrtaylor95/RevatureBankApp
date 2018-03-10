@@ -42,11 +42,6 @@ public class Account implements Serializable {
 		return true;
 	}
 	
-	public boolean transfer(Account to, double amount) {
-		// TODO Implement
-		return false;
-	}
-	
 	/**
 	 * @return The amount currently in the account.
 	 */
@@ -60,5 +55,9 @@ public class Account implements Serializable {
 	
 	public void setNickName(String nickName) {
 		this.nickName = nickName;
+	}
+	
+	public String toString() {
+		return String.format("Account %s:\nBalance: $.2f\n", nickName, balance);
 	}
 }

@@ -77,7 +77,7 @@ public class Bank implements Serializable {
 	 * @param password
 	 * @return The user of the corresponding userName
 	 */
-	public User register(String userName, String password) {
+	public User register(String userName, String password, String firstName, String lastName) {
 		if (userName == null || password == null)
 			throw new NullPointerException();
 		
@@ -90,6 +90,8 @@ public class Bank implements Serializable {
 		}
 		
 		Customer customer = new Customer(userName, password);
+		customer.setFirstName(firstName);
+		customer.setLastName(lastName);
 		customers.put(userName, customer);
 		LoggingUtil.logDebug(String.format("REGISTER: Successful registration for user %s", userName));
 		
@@ -103,7 +105,7 @@ public class Bank implements Serializable {
 	 * @param isAdmin
 	 * @return The user of the corresponding userName
 	 */
-	public User registerEmployee(String userName, String password, boolean isAdmin) {
+	public User registerEmployee(String userName, String password, boolean isAdmin, String firstName, String lastName) {
 		if (userName == null || password == null)
 			throw new NullPointerException();
 		
@@ -121,6 +123,8 @@ public class Bank implements Serializable {
 		} else {
 			employee = new Administrator(userName, password);
 		}
+		employee.setFirstName(firstName);
+		employee.setLastName(lastName);
 		employees.put(userName, employee);
 		
 		LoggingUtil.logDebug(String.format("REGISTER: Successful registration for user %s", userName));

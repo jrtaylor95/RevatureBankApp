@@ -1,5 +1,6 @@
 package com.revature.bank.users;
 
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +15,14 @@ public class Customer extends User {
 	{
 		accounts = new ArrayList<>();
 	}
+	
+	public static Customer parseCustomer(ResultSet set) {
+		Customer customer = new Customer();
+		
+		return customer;
+	}
+	
+	public Customer() {};
 	
 	public Customer(String userName, String password) {
 		super(userName, password);

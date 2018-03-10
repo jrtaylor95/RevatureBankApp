@@ -324,14 +324,18 @@ public class BankDriver {
 		String userName = scanner.next();
 		System.out.print("Password: ");
 		String password = scanner.next();
+		System.out.print("First Name: ");
+		String firstName = scanner.next();
+		System.out.print("Last Name: ");
+		String lastName = scanner.next();
 		boolean isAdmin = false;
 		
 		if (isEmployee) {
 			System.out.print("Administrator (true/false): " );
 			isAdmin = scanner.nextBoolean();
-			return bank.registerEmployee(userName, password, isAdmin);
+			return bank.registerEmployee(userName, password, isAdmin, firstName, lastName);
 		} else {
-			return bank.register(userName, password);
+			return bank.register(userName, password, firstName, lastName);
 		}
 	}
 	
