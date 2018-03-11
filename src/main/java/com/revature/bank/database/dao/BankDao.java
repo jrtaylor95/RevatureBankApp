@@ -1,4 +1,4 @@
-package com.revature.bank.dao;
+package com.revature.bank.database.dao;
 
 import java.sql.SQLException;
 import java.util.List;

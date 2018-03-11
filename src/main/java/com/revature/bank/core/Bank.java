@@ -9,7 +9,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import com.revature.bank.accounts.Account;
-import com.revature.bank.dao.CustomerDao;
+import com.revature.bank.database.dao.CustomerDao;
+import com.revature.bank.database.dao.EmployeeDao;
 import com.revature.bank.users.Administrator;
 import com.revature.bank.users.Customer;
 import com.revature.bank.users.Employee;
@@ -24,12 +25,14 @@ public class Bank implements Serializable {
 	private static final long serialVersionUID = 1647119949555847865L;
 	private Connection connection;
 	private CustomerDao customerDao;
+	private EmployeeDao employeeDao;
 	private Map<String, Customer> customers;
 	private Map<String, Employee> employees;
 	private Map<String, Account> pendingAccounts;
 	{
 		connection = ConnectionFactory.getInstance().getConnection();
 		customerDao = new CustomerDao(connection);
+		employeeDao = new EmployeeDao(connection);
 		customers = new HashMap<>();
 		employees = new HashMap<>();
 		pendingAccounts = new TreeMap<>();
@@ -117,15 +120,13 @@ public class Bank implements Serializable {
 	 * @param password
 	 * @param isAdmin
 	 * @return The user of the corresponding userName
+	 * @throws SQLException 
 	 */
-	public User registerEmployee(String userName, String password, boolean isAdmin, String firstName, String lastName) {
+	public User registerEmployee(String userName, String password, boolean isAdmin, String firstName, String lastName) throws SQLException {
 		if (userName == null || password == null)
 			throw new NullPointerException();
 		
-		if (customers.containsKey(userName)) {
-			LoggingUtil.logError(String.format("REGISTER: Duplicate username %s", userName));
-			return null;
-		} else if (employees.containsKey(userName)) {
+		if (customers.containsKey(userName) || employees.containsKey(userName)) {
 			LoggingUtil.logError(String.format("REGISTER: Duplicate username %s", userName));
 			return null;
 		}
@@ -138,9 +139,16 @@ public class Bank implements Serializable {
 		}
 		employee.setFirstName(firstName);
 		employee.setLastName(lastName);
-		employees.put(userName, employee);
 		
-		LoggingUtil.logDebug(String.format("REGISTER: Successful registration for user %s", userName));
+		try {
+			employeeDao.create(employee);
+			LoggingUtil.logDebug(String.format("REGISTER: Successful registration for user %s", userName));
+		} catch (SQLException e) {
+			LoggingUtil.logError(String.format("REGISTER: Unsuccessful registration for user %s (%s)", userName, e.getMessage()));
+			throw e;
+		}
+		
+//		employees.put(userName, employee);
 		
 		return employee;
 	}

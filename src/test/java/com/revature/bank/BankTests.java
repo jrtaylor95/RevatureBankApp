@@ -113,21 +113,21 @@ public class BankTests {
 	}
 
 	@Test
-	public void testRegisterEmployee() {
+	public void testRegisterEmployee() throws SQLException {
 		Employee expectedCustomer = (Employee) bank.registerEmployee("Employee", "Password", true,  "Mae", "Funke");
 		assertNotNull(expectedCustomer);
 		assertEquals(2, bank.getEmployees().size());
 	}
 
 	@Test
-	public void testRegisterDuplicateEmployee() {
+	public void testRegisterDuplicateEmployee() throws SQLException {
 		Employee expectedEmployee = (Administrator) bank.registerEmployee("Admin", "Password", true,  "Gob", "Bluth");
 		assertNull(expectedEmployee);
 		assertEquals(1, bank.getEmployees().size());
 	}
 
 	@Test
-	public void testRegisterEmployeeWithCustomer() {
+	public void testRegisterEmployeeWithCustomer() throws SQLException {
 		Employee expectedEmployee = (Administrator) bank.registerEmployee("Customer", "Password", true, "Michael", "Bluth");
 		assertNull(expectedEmployee);
 		assertEquals(1, bank.getEmployees().size());

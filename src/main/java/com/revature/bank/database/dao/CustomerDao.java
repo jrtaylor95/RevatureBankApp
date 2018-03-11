@@ -1,4 +1,4 @@
-package com.revature.bank.dao;
+package com.revature.bank.database.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.revature.bank.database.CustomerTable.*;
 import com.revature.bank.users.Customer;
 
 public class CustomerDao implements BankDao<Customer> {
@@ -19,8 +20,8 @@ public class CustomerDao implements BankDao<Customer> {
 	
 	@Override
 	public void create(Customer customer) throws SQLException {
-		String sql = "INSERT INTO CUSTOMER (CUSTOMER_USER_NAME, CUSTOMER_FIRST_NAME, CUSTOMER_LAST_NAME, CUSTOMER_PASSWORD)"
-				+ "VALUES (?,?,?,?)";
+		String sql = String.format("INSERT INTO CUSTOMER (%s, %s, %s, %s) VALUES (?,?,?,?)",
+				CUSTOMER_USER_NAME, CUSTOMER_FIRST_NAME, CUSTOMER_LAST_NAME, CUSTOMER_PASSWORD);
 		
 		PreparedStatement statement = connection.prepareStatement(sql);
 		statement.setString(1, customer.getUserName());
@@ -33,7 +34,8 @@ public class CustomerDao implements BankDao<Customer> {
 
 	@Override
 	public Customer select(int id) throws SQLException {
-		String sql = "SELECT CUSTOMER_ID, CUSTOMER_USER_NAME, CUSTOMER_FIRST_NAME, CUSTOMER_LAST_NAME, CUSTOMER_PASSWORD FROM CUSTOMER WHERE CUSTOMER_ID = ?";
+		String sql = String.format("SELECT %s, %s, %s, %s, %s FROM CUSTOMER WHERE %s = ?",
+				CUSTOMER_ID, CUSTOMER_USER_NAME, CUSTOMER_FIRST_NAME, CUSTOMER_LAST_NAME, CUSTOMER_PASSWORD, CUSTOMER_ID);
 		
 		PreparedStatement statement = connection.prepareStatement(sql);
 		statement.setInt(1, id);
@@ -46,7 +48,8 @@ public class CustomerDao implements BankDao<Customer> {
 	}
 	
 	public Customer select(String userName) throws SQLException {
-		String sql = "SELECT CUSTOMER_ID, CUSTOMER_USER_NAME, CUSTOMER_FIRST_NAME, CUSTOMER_LAST_NAME, CUSTOMER_PASSWORD FROM CUSTOMER WHERE CUSTOMER_USER_NAME = ?";
+		String sql = String.format("SELECT %s, %s, %s, %s, %s FROM CUSTOMER WHERE %s = ?",
+				CUSTOMER_ID, CUSTOMER_USER_NAME, CUSTOMER_FIRST_NAME, CUSTOMER_LAST_NAME, CUSTOMER_PASSWORD, CUSTOMER_USER_NAME);
 		
 		PreparedStatement statement = connection.prepareStatement(sql);
 		statement.setString(1, userName);
@@ -61,7 +64,8 @@ public class CustomerDao implements BankDao<Customer> {
 	@Override
 	public List<Customer> selectAll() throws SQLException {
 		List<Customer> customers = new ArrayList<>();
-		String sql = "SELECT * FROM CUSTOMER";
+		String sql = String.format("SELECT %s, %s, %s, %s, %s FROM CUSTOMER",
+				CUSTOMER_ID, CUSTOMER_USER_NAME, CUSTOMER_FIRST_NAME, CUSTOMER_LAST_NAME, CUSTOMER_PASSWORD);
 		
 		PreparedStatement statement = connection.prepareStatement(sql);
 		
@@ -76,7 +80,8 @@ public class CustomerDao implements BankDao<Customer> {
 
 	@Override
 	public void update(Customer customer) throws SQLException {
-		String sql = "UPDATE CUSTOMER SET CUSTOMER_USER_NAME = ?, CUSTOMER_FIRST_NAME = ?, CUSTOMER_LAST_NAME = ?, CUSTOMER_PASSWORD = ? WHERE CUSTOMER_ID = ?";
+		String sql = String.format("UPDATE CUSTOMER SET %s = ?, %s = ?, %s = ?, %s = ? WHERE %s = ?",
+				CUSTOMER_USER_NAME, CUSTOMER_FIRST_NAME, CUSTOMER_LAST_NAME, CUSTOMER_PASSWORD, CUSTOMER_ID);
 		
 		PreparedStatement statement = connection.prepareStatement(sql);
 		statement.setString(1, customer.getUserName());
@@ -90,7 +95,8 @@ public class CustomerDao implements BankDao<Customer> {
 
 	@Override
 	public void delete(int id) throws SQLException {
-		String sql = "DELETE FROM CUSTOMER WHERE CUSTOMER_ID = ?";
+		String sql = String.format("DELETE FROM CUSTOMER WHERE %s = ?",
+				CUSTOMER_ID);
 		
 		PreparedStatement statement = connection.prepareStatement(sql);
 		statement.setInt(1, id);
@@ -99,7 +105,8 @@ public class CustomerDao implements BankDao<Customer> {
 	}
 	
 	public void delete(String userName) throws SQLException {
-		String sql = "DELETE FROM CUSTOMER WHERE CUSTOMER_ID = ?";
+		String sql = String.format("DELETE FROM CUSTOMER WHERE %s = ?",
+				CUSTOMER_ID);
 		
 		PreparedStatement statement = connection.prepareStatement(sql);
 		statement.setString(1, userName);
