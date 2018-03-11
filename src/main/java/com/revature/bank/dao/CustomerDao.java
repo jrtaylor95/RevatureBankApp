@@ -33,7 +33,7 @@ public class CustomerDao implements BankDao<Customer> {
 
 	@Override
 	public Customer select(int id) throws SQLException {
-		String sql = "SELECT * FROM CUSTOMER WHERE CUSTOMER_ID = ?";
+		String sql = "SELECT CUSTOMER_ID, CUSTOMER_USER_NAME, CUSTOMER_FIRST_NAME, CUSTOMER_LAST_NAME, CUSTOMER_PASSWORD FROM CUSTOMER WHERE CUSTOMER_ID = ?";
 		
 		PreparedStatement statement = connection.prepareStatement(sql);
 		statement.setInt(1, id);
@@ -46,7 +46,7 @@ public class CustomerDao implements BankDao<Customer> {
 	}
 	
 	public Customer select(String userName) throws SQLException {
-		String sql = "SELECT * FROM CUSTOMER WHERE CUSTOMER_USER_NAME = ?";
+		String sql = "SELECT CUSTOMER_ID, CUSTOMER_USER_NAME, CUSTOMER_FIRST_NAME, CUSTOMER_LAST_NAME, CUSTOMER_PASSWORD FROM CUSTOMER WHERE CUSTOMER_USER_NAME = ?";
 		
 		PreparedStatement statement = connection.prepareStatement(sql);
 		statement.setString(1, userName);
@@ -94,6 +94,15 @@ public class CustomerDao implements BankDao<Customer> {
 		
 		PreparedStatement statement = connection.prepareStatement(sql);
 		statement.setInt(1, id);
+		
+		statement.executeUpdate();
+	}
+	
+	public void delete(String userName) throws SQLException {
+		String sql = "DELETE FROM CUSTOMER WHERE CUSTOMER_ID = ?";
+		
+		PreparedStatement statement = connection.prepareStatement(sql);
+		statement.setString(1, userName);
 		
 		statement.executeUpdate();
 	}
