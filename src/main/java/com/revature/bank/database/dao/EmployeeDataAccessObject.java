@@ -2,6 +2,7 @@ package com.revature.bank.database.dao;
 
 import static com.revature.bank.database.EmployeeTable.*;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,18 +12,18 @@ import java.util.List;
 
 import com.revature.bank.users.Employee;
 
-public class EmployeeDao implements BankDao<Employee> {
+public class EmployeeDataAccessObject implements DataAccessObject<Employee> {
 
 	private Connection connection;
 	
-	public EmployeeDao(Connection connection) {
+	public EmployeeDataAccessObject(Connection connection) {
 		this.connection = connection;
 	}
 	
 	@Override
 	public void create(Employee employee) throws SQLException {
 		String sql = String.format("INSERT INTO EMPLOYEE (%s, %s, %s, %s) VALUES (?,?,?,?)",
-				EMPLOYEE_USER_NAME, EMPLOYEE_FIRST_NAME, EMPLOYEE_LAST_NAME, EMPLOYEE_PASSWORD);
+				E_USER_NAME, E_FIRST_NAME, E_LAST_NAME, E_PASSWORD);
 		
 		PreparedStatement statement = connection.prepareStatement(sql);
 		statement.setString(1, employee.getUserName());
@@ -36,7 +37,7 @@ public class EmployeeDao implements BankDao<Employee> {
 	@Override
 	public Employee select(int id) throws SQLException {
 		String sql = String.format("SELECT %s, %s, %s, %s, %s FROM EMPLOYEE WHERE %s = ?",
-				EMPLOYEE_ID, EMPLOYEE_USER_NAME, EMPLOYEE_FIRST_NAME, EMPLOYEE_LAST_NAME, EMPLOYEE_PASSWORD, EMPLOYEE_ID);
+				E_ID, E_USER_NAME, E_FIRST_NAME, E_LAST_NAME, E_PASSWORD, E_ID);
 		
 		PreparedStatement statement = connection.prepareStatement(sql);
 		statement.setInt(1, id);
@@ -50,7 +51,7 @@ public class EmployeeDao implements BankDao<Employee> {
 	
 	public Employee select(String userName) throws SQLException {
 		String sql = String.format("SELECT %s, %s, %s, %s, %s FROM EMPLOYEE WHERE %s = ?",
-				EMPLOYEE_ID, EMPLOYEE_USER_NAME, EMPLOYEE_FIRST_NAME, EMPLOYEE_LAST_NAME, EMPLOYEE_PASSWORD, EMPLOYEE_USER_NAME);
+				E_ID, E_USER_NAME, E_FIRST_NAME, E_LAST_NAME, E_PASSWORD, E_USER_NAME);
 		
 		PreparedStatement statement = connection.prepareStatement(sql);
 		statement.setString(1, userName);
@@ -66,7 +67,7 @@ public class EmployeeDao implements BankDao<Employee> {
 	public List<Employee> selectAll() throws SQLException {
 		List<Employee> employees = new ArrayList<>();
 		String sql = String.format("SELECT %s, %s, %s, %s, %s FROM EMPLOYEE",
-				EMPLOYEE_ID, EMPLOYEE_USER_NAME, EMPLOYEE_FIRST_NAME, EMPLOYEE_LAST_NAME, EMPLOYEE_PASSWORD);
+				E_ID, E_USER_NAME, E_FIRST_NAME, E_LAST_NAME, E_PASSWORD);
 		
 		PreparedStatement statement = connection.prepareStatement(sql);
 		
@@ -82,7 +83,7 @@ public class EmployeeDao implements BankDao<Employee> {
 	@Override
 	public void update(Employee employee) throws SQLException {
 		String sql = String.format("UPDATE EMPLOYEE SET %S = ?, %S = ?, %S = ?, %S = ? WHERE %S = ?",
-				EMPLOYEE_USER_NAME, EMPLOYEE_FIRST_NAME, EMPLOYEE_LAST_NAME, EMPLOYEE_PASSWORD);
+				E_USER_NAME, E_FIRST_NAME, E_LAST_NAME, E_PASSWORD);
 		
 		PreparedStatement statement = connection.prepareStatement(sql);
 		statement.setString(1, employee.getUserName());
@@ -97,7 +98,7 @@ public class EmployeeDao implements BankDao<Employee> {
 	@Override
 	public void delete(int id) throws SQLException {
 		String sql = String.format("DELETE FROM EMPLOYEE WHERE %s = ?",
-				EMPLOYEE_ID);
+				E_ID);
 		
 		PreparedStatement statement = connection.prepareStatement(sql);
 		statement.setInt(1, id);
@@ -107,10 +108,19 @@ public class EmployeeDao implements BankDao<Employee> {
 	
 	public void delete(String userName) throws SQLException {
 		String sql = String.format("DELETE FROM EMPLOYEE WHERE %s = ?",
-				EMPLOYEE_USER_NAME);
+				E_USER_NAME);
 		
 		PreparedStatement statement = connection.prepareStatement(sql);
 		statement.setString(1, userName);
+		
+		statement.executeUpdate();
+	}
+	
+	public void toggleActive(int id) throws SQLException {
+		String sql = "{call TOGGLE_EMPLOYEE_ACTIVE(?)}";
+		
+		CallableStatement statement = connection.prepareCall(sql);
+		statement.setInt(1, id);
 		
 		statement.executeUpdate();
 	}

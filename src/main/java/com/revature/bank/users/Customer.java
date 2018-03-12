@@ -20,7 +20,7 @@ public class Customer extends User {
 	public static Customer parseCustomer(ResultSet set) throws SQLException {
 		Customer customer = new Customer();
 
-		customer.setID(set.getInt(1));
+		customer.setID(set.getShort(1));
 		customer.setUserName(set.getString(2));
 		customer.setFirstName(set.getString(3));
 		customer.setLastName(set.getString(4));

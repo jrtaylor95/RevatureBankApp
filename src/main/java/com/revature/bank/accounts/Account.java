@@ -1,18 +1,30 @@
 package com.revature.bank.accounts;
 
 import java.io.Serializable;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class Account implements Serializable {
-	/**
-	 * 
-	 */
 	
 	private static final long serialVersionUID = -898679925211200313L;
+	private int id;
 	private String nickName;
 	private double balance;
 	{
 		balance = 0;
 	}
+	
+	public static Account parseAccount(ResultSet set) throws SQLException {
+		Account account = new Account();
+		
+		account.setId(set.getInt(1));
+		account.setNickName(set.getString(2));
+		account.setBalance(set.getDouble(3));
+		
+		return account;
+	}
+	
+	public Account() {}
 	
 	public Account(String nickName) {
 		this.nickName = nickName;
@@ -60,4 +72,17 @@ public class Account implements Serializable {
 	public String toString() {
 		return String.format("Account %s:\nBalance: $.2f\n", nickName, balance);
 	}
+	
+	private void setId(int id) {
+		this.id = id;
+	}
+	
+	public int getId() {
+		return id;
+	}
+	
+	private void setBalance(double balance) {
+		this.balance = balance;
+	}
+	
 }

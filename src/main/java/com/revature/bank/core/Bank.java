@@ -1,16 +1,16 @@
 package com.revature.bank.core;
 import java.io.Serializable;
+import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeMap;
+import java.sql.Types;
+import java.util.List;
 import com.revature.bank.accounts.Account;
-import com.revature.bank.database.dao.CustomerDao;
-import com.revature.bank.database.dao.EmployeeDao;
+import com.revature.bank.database.dao.AccountDataAccessObject;
+import com.revature.bank.database.dao.CustomerDataAccessObject;
+import com.revature.bank.database.dao.EmployeeDataAccessObject;
 import com.revature.bank.users.Administrator;
 import com.revature.bank.users.Customer;
 import com.revature.bank.users.Employee;
@@ -24,64 +24,73 @@ public class Bank implements Serializable {
 	 */
 	private static final long serialVersionUID = 1647119949555847865L;
 	private Connection connection;
-	private CustomerDao customerDao;
-	private EmployeeDao employeeDao;
-	private Map<String, Customer> customers;
-	private Map<String, Employee> employees;
-	private Map<String, Account> pendingAccounts;
+	private CustomerDataAccessObject customerDao;
+	private EmployeeDataAccessObject employeeDao;
+	private AccountDataAccessObject accountDao;
 	{
 		connection = ConnectionFactory.getInstance().getConnection();
-		customerDao = new CustomerDao(connection);
-		employeeDao = new EmployeeDao(connection);
-		customers = new HashMap<>();
-		employees = new HashMap<>();
-		pendingAccounts = new TreeMap<>();
+		customerDao = new CustomerDataAccessObject(connection);
+		employeeDao = new EmployeeDataAccessObject(connection);
+		accountDao = new  AccountDataAccessObject(connection);
+	}
+
+	public Customer getCustomer(String userName) throws SQLException {
+		return customerDao.select(userName);
 	}
 	
-	public Collection<Customer> getCustomers() {
-		return customers.values();
+	public List<Customer> getCustomers() throws SQLException {
+		return customerDao.selectAll();
+	}
+
+	public List<Employee> getEmployees() throws SQLException {
+		return employeeDao.selectAll();
+	}
+
+	public List<Account> getPendingAccounts(Customer customer) throws SQLException {
+		return accountDao.selectPending(customer.getUserName());
 	}
 	
-	public Collection<Employee> getEmployees() {
-		return employees.values();
+	public List<Account> getAccounts(Customer customer) throws SQLException {
+		return accountDao.select(customer.getUserName());
 	}
-	
-	public Set<Entry<String, Account>> getPendingAccounts() {
-		return pendingAccounts.entrySet();
-	}
-	
+
 	/**
 	 * Acts as a way for a user to log in to the bank
 	 * @param userName
 	 * @param password
 	 * @return The user of the corresponding userName
+	 * @throws SQLException 
 	 */
-	public User logon(String userName, String password) {
+	public User logon(String userName, String password) throws SQLException {
 		User user = null;
-		
+
 		if (userName == null || password == null)
 			throw new NullPointerException();
-		
-		if (customers.containsKey(userName)) {
-			user = customers.get(userName);
-		} else if (employees.containsKey(userName)) {
-			user = employees.get(userName);
-		}
-		
-		if (user != null) {
-			if (user.checkPassword(password)) {
-				LoggingUtil.logDebug(String.format("LOGON: Successful log in attempt for user %s", userName));
-				return user;
-			} else {
-				LoggingUtil.logDebug(String.format("LOGON: Unsuccessful log in attempt for user %s", userName));
-				return null;
-			}
-		} else
+
+		String sql = "SELECT USER_NAME, PASSWORD FROM USER_LOGON WHERE USER_NAME = ?";
+		PreparedStatement statement = connection.prepareStatement(sql);
+		statement.setString(1, userName);
+		ResultSet set = statement.executeQuery();
+
+		if (!set.next())
 			return null;
-		
-		
+
+		String actualPassword = set.getString(2);
+
+		if (!password.equals(actualPassword)) {
+			LoggingUtil.logDebug(String.format("LOGON: Unsuccessful log in attempt for user %s", userName));
+			return null;
+		}
+
+		user = customerDao.select(userName);
+
+		if (user == null)
+			user = employeeDao.select(userName);
+		LoggingUtil.logDebug(String.format("LOGON: Successful log in attempt for user %s", userName));
+		return user;
+
 	}
-	
+
 	/**
 	 * Acts as a way to register a user to the bank
 	 * @param userName
@@ -92,16 +101,21 @@ public class Bank implements Serializable {
 	public User register(String userName, String password, String firstName, String lastName) throws SQLException {
 		if (userName == null || password == null)
 			throw new NullPointerException();
-		
-		if (customers.containsKey(userName) || employees.containsKey(userName)) {
+
+		CallableStatement statement = connection.prepareCall("{? = call IS_DUPLICATE_USER_NAME(?)}");
+		statement.registerOutParameter(1, Types.SMALLINT);
+		statement.setString(2, userName);
+		statement.executeUpdate();
+		boolean isDuplicate = statement.getShort(1) == 1 ? true : false;
+
+
+		if (isDuplicate)
 			LoggingUtil.logError(String.format("REGISTER: Duplicate username %s", userName));
-			return null;
-		}
-		
+
 		Customer customer = new Customer(userName, password);
 		customer.setFirstName(firstName);
 		customer.setLastName(lastName);
-		
+
 		try {
 			customerDao.create(customer);
 			LoggingUtil.logDebug(String.format("REGISTER: Successful registration for user %s", userName));
@@ -109,11 +123,10 @@ public class Bank implements Serializable {
 			LoggingUtil.logError(String.format("REGISTER: Unsuccessful registration for user %s (%s)", userName, e.getMessage()));
 			throw e;
 		}
-//		customers.put(userName, customer);
-		
+
 		return customer;
 	}
-	
+
 	/**
 	 * Acts as a way to register an employee to the bank
 	 * @param userName
@@ -125,12 +138,16 @@ public class Bank implements Serializable {
 	public User registerEmployee(String userName, String password, boolean isAdmin, String firstName, String lastName) throws SQLException {
 		if (userName == null || password == null)
 			throw new NullPointerException();
-		
-		if (customers.containsKey(userName) || employees.containsKey(userName)) {
+
+		CallableStatement statement = connection.prepareCall("{? = call IS_DUPLICATE_USER_NAME(?)}");
+		statement.registerOutParameter(1, Types.SMALLINT);
+		statement.setString(2, userName);
+		statement.executeUpdate();
+		boolean isDuplicate = statement.getShort(1) == 1 ? true : false;
+
+		if (isDuplicate)
 			LoggingUtil.logError(String.format("REGISTER: Duplicate username %s", userName));
-			return null;
-		}
-		
+
 		Employee employee = null;
 		if (!isAdmin) {
 			employee = new Employee(userName, password);
@@ -139,7 +156,7 @@ public class Bank implements Serializable {
 		}
 		employee.setFirstName(firstName);
 		employee.setLastName(lastName);
-		
+
 		try {
 			employeeDao.create(employee);
 			LoggingUtil.logDebug(String.format("REGISTER: Successful registration for user %s", userName));
@@ -147,12 +164,10 @@ public class Bank implements Serializable {
 			LoggingUtil.logError(String.format("REGISTER: Unsuccessful registration for user %s (%s)", userName, e.getMessage()));
 			throw e;
 		}
-		
-//		employees.put(userName, employee);
-		
+
 		return employee;
 	}
-	
+
 	/**
 	 * Allows a user to apply for an account with the nickName accountName
 	 * @param customer
@@ -160,133 +175,146 @@ public class Bank implements Serializable {
 	 */
 	public void apply(Customer customer, String accountName) {
 		Account account = new Account(accountName);
-		pendingAccounts.put(customer.getUserName(), account);
-		LoggingUtil.logDebug(String.format("ACCOUNT_APPLICATION: User %s applied for account %s", customer.getUserName(), accountName));
+		try {
+			accountDao.create(account, customer);
+			LoggingUtil.logDebug(String.format("ACCOUNT_APPLICATION: User %s successfully applied for account %s",
+					customer.getUserName(), accountName));
+		} catch (SQLException e) {
+			LoggingUtil.logError(String.format("ACCOUNT_APPLICATION: User %s unsuccessfully tried to apply for account %s (%s)",
+					customer.getUserName(), accountName, e.getMessage()));
+		}
 	}
-	
+
 	public void applyJoint(Customer customer, String jointCustomerUserName, String accountName) {
 		Account account = new Account(accountName);
-		pendingAccounts.put(customer.getUserName(), account);
-		pendingAccounts.put(jointCustomerUserName, account);
-		LoggingUtil.logDebug(String.format("ACCOUNT_APPLICATION: User %s applied for account %s", customer.getUserName(), accountName));
+		try {
+			accountDao.create(account, customer);
+			LoggingUtil.logDebug(String.format("ACCOUNT_APPLICATION: User %s successfully applied for account %s",
+					customer.getUserName(), accountName));
+		} catch (SQLException e) {
+			LoggingUtil.logError(String.format("ACCOUNT_APPLICATION: User %s unsuccessfully tried to apply for account %s (%s)",
+					customer.getUserName(), accountName, e.getMessage()));
+		}
 	}
-	
-	/**
-	 * Allows a user to withdraw amount from their account specified by accountIdx
-	 * @param customer
-	 * @param accountIdx
-	 * @param amount
-	 * @return
-	 * @throws IllegalArgumentException
-	 */
-	public boolean withdraw(Customer customer, int accountIdx, double amount) throws IllegalArgumentException {
-		Account account = customer.getAccount(accountIdx);
-		boolean wasSuccessful = account.withdraw(amount);
-		
-		if (wasSuccessful)
+
+	private void withdraw(Account account, double amount) throws SQLException {
+		account.withdraw(amount);
+		connection.setAutoCommit(false);
+		accountDao.update(account);
+		// TODO Log Transaction
+		connection.commit();
+		connection.setAutoCommit(true);
+	}
+
+	public void withdraw(Customer customer, Account account, double amount) {
+		try {
+			withdraw(account, amount);
 			LoggingUtil.logDebug(String.format("WITHDRAW: Customer %s successfully withdrawed $%.2f from account %s",
 					customer.getUserName(), amount, account.getNickName()));
-		else
-			LoggingUtil.logDebug(String.format("WITHDRAW: Customer %s unsuccessfully tried to withdraw $%.2f from account %s",
-					customer.getUserName(), amount, account.getNickName()));
-		
-		return wasSuccessful;
+		} catch (SQLException e) {
+			LoggingUtil.logError(String.format("WITHDRAW: Customer %s unsuccessfully tried to withdraw $%.2f from account %s (%s)",
+					customer.getUserName(), amount, account.getNickName(), e.getMessage()));
+		}
 	}
-	
-	/**
-	 * Allows an admin to withdraw amount from a customer's account specified by accountIdx
-	 * @param admin
-	 * @param customerUserName
-	 * @param accountIdx
-	 * @param amount
-	 * @return
-	 * @throws SQLException 
-	 * @throws NullPointerException 
-	 */
-	public boolean withdraw(Administrator admin, String customerUserName, int accountIdx, double amount) throws NullPointerException, SQLException {
-		Customer customer = findCustomer(customerUserName);
-		
-		if (customer == null)
-			return false;
-		
-		Account account = customer.getAccount(accountIdx);
-		boolean wasSuccessful = account.withdraw(amount);
-		
-		if (wasSuccessful)
+
+	public void withdraw(Administrator admin, Customer customer, Account account, double amount) {
+		try {
+			withdraw(account, amount);
 			LoggingUtil.logDebug(String.format("WITHDRAW: Administrator %s successfully withdrawed $%.2f from user %s account %s",
-					admin.getUserName(), amount, customerUserName, account.getNickName()));
-		else
-			LoggingUtil.logDebug(String.format("WITHDRAW: Administrator %s unsuccessfully tried to withdraw $%.2f from user %s account %s",
-					admin.getUserName(), amount, customerUserName, account.getNickName()));
-		
-		return wasSuccessful;
+					admin.getUserName(), amount, customer.getUserName(), account.getNickName()));
+		} catch (SQLException e) {
+			LoggingUtil.logDebug(String.format("WITHDRAW: Administrator %s unsuccessfully tried to withdraw $%.2f from user %s account %s (%s)",
+					admin.getUserName(), amount, customer.getUserName(), account.getNickName(), e.getMessage()));
+		}
 	}
-	
-	/**
-	 * Allows a customer to deposit amount into their account specified by accountIdx
-	 * @param customer
-	 * @param accountIdx
-	 * @param amount
-	 * @return
-	 */
-	public boolean deposit(Customer customer, int accountIdx, double amount) {
-		Account account = customer.getAccount(accountIdx);
-		boolean wasSuccessful = account.deposit(amount);
-		
-		if (wasSuccessful)
+
+
+	private void deposit(Account account, double amount) throws SQLException {
+		account.deposit(amount);
+		connection.setAutoCommit(false);
+		accountDao.update(account);
+		// TODO Log Transaction
+		connection.commit();
+		connection.setAutoCommit(true);
+	}
+
+	public void deposit(Customer customer, Account account, double amount) {
+		try {
+			deposit(account, amount);
 			LoggingUtil.logDebug(String.format("DEPOSIT: Customer %s successfully deposited $%.2f to account %s",
 					customer.getUserName(), amount, account.getNickName()));
-		else
-			LoggingUtil.logDebug(String.format("DEPOSIT: Customer %s unsuccessfully tried to deposit $%.2f to account %s",
-					customer.getUserName(), amount, account.getNickName()));
-		
-		return wasSuccessful;
+		} catch (SQLException e) {
+			LoggingUtil.logDebug(String.format("DEPOSIT: Customer %s unsuccessfully tried to deposit $%.2f to account %s (%s)",
+					customer.getUserName(), amount, account.getNickName(), e.getMessage()));
+		}
 	}
-	
-	/**
-	 * Allows an admin to deposit amount into a customer's account specified by accountIdx
-	 * @param admin
-	 * @param customerUserName
-	 * @param accountIdx
-	 * @param amount
-	 * @return
-	 * @throws SQLException 
-	 * @throws NullPointerException 
-	 */
-	public boolean deposit(Administrator admin, String customerUserName, int accountIdx, double amount) throws NullPointerException, SQLException {
-		Customer customer = findCustomer(customerUserName);
-		
-		if (customer == null)
-			return false;
-		
-		Account account = customer.getAccount(accountIdx);
-		boolean wasSuccessful = account.deposit(amount);
-		
-		if (wasSuccessful)
+
+	public void deposit(Administrator admin, Customer customer, Account account, double amount) {
+		try {
+			deposit(account, amount);
 			LoggingUtil.logDebug(String.format("DEPOSIT: Administrator %s successfully deposited $%.2f to user %s account %s",
-					admin.getUserName(), amount, customerUserName, account.getNickName()));
-		else
-			LoggingUtil.logDebug(String.format("DEPOSIT: Administrator %s unsuccessfully tried to deposit $%.2f to user %s account %s",
-					admin.getUserName(), amount, customerUserName, account.getNickName()));
-		
-		return wasSuccessful;
+					admin.getUserName(), amount, customer.getUserName(), account.getNickName()));
+		} catch (SQLException e) {
+			LoggingUtil.logDebug(String.format("DEPOSIT: Administrator %s unsuccessfully tried to deposit $%.2f to user %s account %s (%)",
+					admin.getUserName(), amount, customer.getUserName(), account.getNickName(), e.getMessage()));
+		}
 	}
-	
-	/**
-	 * Transfers amount from one account to another
-	 * @param fromAccount
-	 * @param toAccount
-	 * @param amount
-	 * @return
-	 * @throws IllegalArgumentException
-	 */
-	private boolean transfer(Account fromAccount, Account toAccount, double amount) throws IllegalArgumentException {
+
+	private void transfer(Account fromAccount, Account toAccount, double amount) throws SQLException {
 		fromAccount.withdraw(amount);
 		toAccount.deposit(amount);
-		
-		return true;
+		connection.setAutoCommit(false);
+		accountDao.update(fromAccount);
+		accountDao.update(toAccount);
+		// TODO Log Transaction
+		connection.commit();
+		connection.setAutoCommit(true);
 	}
-	
+
+	public void transfer(Customer customer, Account fromAccount, Account toAccount, double amount) {
+		try {
+			transfer(fromAccount, toAccount, amount);
+			LoggingUtil.logDebug(String.format("TRANSFER: User %s successfully transfered $%.2f from account %s to account %s",
+					customer.getUserName(), amount, fromAccount.getNickName(), toAccount.getNickName()));
+		} catch (SQLException e) {
+			LoggingUtil.logDebug(String.format("TRANSFER: User %s unsuccessfully tried to transfer $%.2f from account %s to account %s (%s)",
+					customer.getUserName(), amount, fromAccount.getNickName(), toAccount.getNickName(), e.getMessage()));
+		}
+	}
+
+	public void transfer(Administrator admin, Customer customer, Account fromAccount, Account toAccount, double amount) {
+		try {
+			transfer(fromAccount, toAccount, amount);
+			LoggingUtil.logDebug(String.format("TRANSFER: Administrator %s successfully transfered $%.2f from user %s account %s to account %s",
+					admin.getUserName(), amount, customer.getUserName(), fromAccount.getNickName(), toAccount.getNickName()));
+		} catch (SQLException e) {
+			LoggingUtil.logDebug(String.format("TRANSFER: Administrator %s unsuccessfully tried to transfered $%.2f from user %s account %s to account %s (%s)",
+					admin.getUserName(), amount, customer.getUserName(), fromAccount.getNickName(), toAccount.getNickName(), e.getMessage()));
+		}
+	}
+
+	public void transfer(Customer fromCustomer, Account fromAccount, Customer toCustomer, Account toAccount, double amount) {
+		try {
+			transfer(fromAccount, toAccount, amount);
+			LoggingUtil.logDebug(String.format("TRANSFER: User %s successfully transfered $%.2f from account %s to user %s account %s",
+					fromCustomer.getUserName(), amount, fromAccount.getNickName(), toCustomer.getUserName(), toAccount.getNickName()));
+		} catch (SQLException e) {
+			LoggingUtil.logDebug(String.format("TRANSFER: User %s unsuccessfully tried to transfer $%.2f from account %s to user %s account %s (%s)",
+					fromCustomer.getUserName(), amount, fromAccount.getNickName(), toCustomer.getUserName(), toAccount.getNickName(), e.getMessage()));
+		}
+	}
+
+	public void transfer(Administrator admin, Customer fromCustomer, Account fromAccount, Customer toCustomer, Account toAccount, double amount) {
+		try {
+			transfer(fromAccount, toAccount, amount);
+			LoggingUtil.logDebug(String.format("TRANSFER: Administrator %s successfully transfered $%.2f from user %s account %s to user %s account %s",
+					admin.getUserName(), amount, fromCustomer.getUserName(), fromAccount.getNickName(), toCustomer.getUserName(), toAccount.getNickName()));
+		} catch (SQLException e) {
+			LoggingUtil.logDebug(String.format("TRANSFER: Administrator %s unsuccessfully tried to transfered $%.2f from user %s account %s to user %s account %s (%s)",
+					admin.getUserName(), amount, fromCustomer.getUserName(), fromAccount.getNickName(), toCustomer.getUserName(), toAccount.getNickName(), e.getMessage()));
+		}
+	}
+
 	/**
 	 * Finds a customer based on a userName
 	 * @param userName
@@ -297,123 +325,11 @@ public class Bank implements Serializable {
 	private Customer findCustomer(String userName) throws NullPointerException, SQLException {
 		if (userName == null)
 			throw new NullPointerException();
-		
+
 		return customerDao.select(userName);
 	}
-	
-	/**
-	 * Allows a customer to transfer amount to another of their accounts
-	 * @param customer
-	 * @param fromAccountIdx
-	 * @param toAccountIdx
-	 * @param amount
-	 * @return
-	 */
-	public boolean transfer(Customer customer, int fromAccountIdx, int toAccountIdx, double amount) {
-		Account fromAccount = customer.getAccount(fromAccountIdx);
-		Account toAccount = customer.getAccount(toAccountIdx);
-		boolean wasSuccessful = transfer(fromAccount, toAccount, amount);
-		
-		if (wasSuccessful)
-			LoggingUtil.logDebug(String.format("TRANSFER: User %s successfully transfered $%.2f from account %s to account %s",
-					customer.getUserName(), amount, fromAccount.getNickName(), toAccount.getNickName()));
-		else
-			LoggingUtil.logDebug(String.format("TRANSFER: User %s unsuccessfully tried to transfer $%.2f from account %s to account %s",
-					customer.getUserName(), amount, fromAccount.getNickName(), toAccount.getNickName()));
-		
-		return wasSuccessful;
-	}
-	
-	/**
-	 * Allows a customer to transfer amount to another user's account
-	 * @param fromCustomer
-	 * @param fromAccountIdx
-	 * @param toCustomerUserName
-	 * @param toAccountIdx
-	 * @param amount
-	 * @return
-	 * @throws IllegalArgumentException
-	 */
-	public boolean transfer(Customer fromCustomer, int fromAccountIdx, String toCustomerUserName, int toAccountIdx, double amount) throws IllegalArgumentException, SQLException {
-		Customer toCustomer = findCustomer(toCustomerUserName);
-		
-		if (toCustomer == null)
-			return false;
-		
-		Account fromAccount = fromCustomer.getAccount(fromAccountIdx);
-		Account toAccount = toCustomer.getAccount(toAccountIdx);
-		boolean wasSuccessful = transfer(fromAccount, toAccount, amount);
-		
-		if (wasSuccessful)
-			LoggingUtil.logDebug(String.format("TRANSFER: User %s successfully transfered $%.2f from account %s to user %s account %s",
-					fromCustomer.getUserName(), amount, fromAccount.getNickName(), toCustomer.getUserName(), toAccount.getNickName()));
-		else
-			LoggingUtil.logDebug(String.format("TRANSFER: User %s unsuccessfully tried to transfer $%.2f from account %s to user %s account %s",
-					fromCustomer.getUserName(), amount, fromAccount.getNickName(), toCustomer.getUserName(), toAccount.getNickName()));
-		
-		return wasSuccessful;
-	}
-	
-	/**
-	 * Allows an admin to transfer amount from one user's account to another
-	 * @param admin
-	 * @param customerUserName
-	 * @param fromAccountIdx
-	 * @param toAccountIdx
-	 * @param amount
-	 * @return
-	 */
-	public boolean transfer(Administrator admin, String customerUserName, int fromAccountIdx, int toAccountIdx, double amount) throws SQLException {
-		Customer customer = findCustomer(customerUserName);
-		
-		if (customer == null)
-			return false;
-		
-		Account fromAccount = customer.getAccount(fromAccountIdx);
-		Account toAccount = customer.getAccount(toAccountIdx);
-		boolean wasSuccessful = transfer(fromAccount, toAccount, amount);
-		
-		if (wasSuccessful)
-			LoggingUtil.logDebug(String.format("TRANSFER: Administrator %s successfully transfered $%.2f from user %s account %s to account %s",
-					admin.getUserName(), amount, customerUserName, fromAccount.getNickName(), toAccount.getNickName()));
-		else
-			LoggingUtil.logDebug(String.format("TRANSFER: Administrator %s unsuccessfully tried to transfered $%.2f from user %s account %s to account %s",
-					admin.getUserName(), amount, customerUserName, fromAccount.getNickName(), toAccount.getNickName()));
-		
-		return wasSuccessful;
-	}
-	
-	/**
-	 * Allows an admin to transfer amount from one customer to another
-	 * @param admin
-	 * @param fromCustomerUserName
-	 * @param fromAccountIdx
-	 * @param toCustomerUserName
-	 * @param toAccountIdx
-	 * @param amount
-	 * @return
-	 */
-	public boolean transfer(Administrator admin, String fromCustomerUserName, int fromAccountIdx, String toCustomerUserName, int toAccountIdx, double amount) throws SQLException {
-		Customer fromCustomer = findCustomer(fromCustomerUserName);
-		Customer toCustomer = findCustomer(toCustomerUserName);
-		
-		if (fromCustomer == null || toCustomer == null)
-			return false;
-		
-		Account fromAccount = fromCustomer.getAccount(fromAccountIdx);
-		Account toAccount = toCustomer.getAccount(toAccountIdx);
-		boolean wasSuccessful = transfer(fromAccount, toAccount, amount);
-		
-		if (wasSuccessful)
-			LoggingUtil.logDebug(String.format("TRANSFER: Administrator %s successfully transfered $%.2f from user %s account %s to user %s account %s",
-					admin.getUserName(), amount, fromCustomerUserName, fromAccount.getNickName(), toCustomerUserName, toAccount.getNickName()));
-		else
-			LoggingUtil.logDebug(String.format("TRANSFER: Administrator %s unsuccessfully tried to transfered $%.2f from user %s account %s to user %s account %s",
-					admin.getUserName(), amount, fromCustomerUserName, fromAccount.getNickName(), toCustomerUserName, toAccount.getNickName()));
-		
-		return wasSuccessful;
-	}
-	
+
+
 	/**
 	 * Allows an admin to cancel an account
 	 * @param admin
@@ -421,20 +337,20 @@ public class Bank implements Serializable {
 	 * @param accountIdx
 	 * @return
 	 */
-	public boolean cancelAccount(Administrator admin, String customerUserName, int accountIdx) throws SQLException {
-		if (customerUserName == null || admin == null)
+	public void cancelAccount(Administrator admin, Customer customer, Account account) throws SQLException {
+		if (admin == null || customer == null || account == null)
 			throw new NullPointerException();
-		
-		Customer customer = findCustomer(customerUserName);
-		Account account = customer.getAccount(accountIdx);
-		customer.removeAccount(accountIdx);
-		
-		LoggingUtil.logDebug(String.format("CANCEL_ACCOUNT: Adminsitrator %s canceled user %s account %s",
-				admin.getUserName(), customerUserName, account.getNickName()));
-		
-		return true;
+
+		try {
+			accountDao.toggleActive(account.getId());
+			LoggingUtil.logDebug(String.format("CANCEL_ACCOUNT: Adminsitrator %s successfully canceled user %s account %s",
+					admin.getUserName(), customer.getUserName(), account.getNickName()));
+		} catch (SQLException e) {
+			LoggingUtil.logDebug(String.format("CANCEL_ACCOUNT: Adminsitrator %s unsuccessfully tried to cancel user %s account %s (%s)",
+					admin.getUserName(), customer.getUserName(), account.getNickName(), e.getMessage()));
+		}
 	}
-	
+
 	/**
 	 * Allows an employee to get customer information
 	 * @param employee
@@ -443,61 +359,51 @@ public class Bank implements Serializable {
 	 */
 	public String getCustomerInformation(Employee employee, String customerUserName) throws SQLException {
 		Customer customer = findCustomer(customerUserName);
-		
+
 		if (customer == null)
 			return null;
-		
+
 		return customer.toString();
-		
+
 	}
-	
+
 	/**
 	 * Allows an employee to approve an account
 	 * @param employee
 	 * @param customerUserName
 	 * @return
 	 */
-	public boolean approveAccount(Employee employee, String customerUserName) throws SQLException {
-		if (customerUserName == null)
+	public void approveAccount(Employee employee, Customer customer, Account account) throws SQLException {
+		if (employee == null || customer == null || account == null)
 			throw new NullPointerException();
-		
-		Customer customer = findCustomer(customerUserName);
-		if (customer == null)
-			return false;
-		
-		Account account = pendingAccounts.remove(customerUserName);
-		if (account == null)
-			return false;
-		
-		customer.addAccount(account);
-		
-		LoggingUtil.logDebug(String.format("APPROVE_ACCOUNT: Employee %s approved user %s account %s",
-				employee.getUserName(), customerUserName, account.getNickName()));
-		
-		return false;
+
+		try {
+			accountDao.approveAccount(account.getId());
+			LoggingUtil.logDebug(String.format("APPROVE_ACCOUNT: Employee %s successfully approved user %s account %s",
+					employee.getUserName(), customer.getUserName(), account.getNickName()));
+		} catch (SQLException e) {
+			LoggingUtil.logDebug(String.format("APPROVE_ACCOUNT: Employee %s unsuccessfully tried to approve user %s account %s (%s)",
+					employee.getUserName(), customer.getUserName(), account.getNickName(), e.getMessage()));
+		}
 	}
-	
+
 	/**
 	 * Allows an employee to reject an account
 	 * @param employee
 	 * @param customerUserName
 	 * @return
 	 */
-	public boolean rejectAccount(Employee employee, String customerUserName) throws SQLException {
-		if (customerUserName == null)
+	public void rejectAccount(Employee employee, Customer customer, Account account) throws SQLException {
+		if (employee == null || customer == null || account == null)
 			throw new NullPointerException();
-		
-		Customer customer = findCustomer(customerUserName);
-		if (customer == null)
-			return false;
-		
-		Account account = pendingAccounts.remove(customerUserName);
-		if (account == null)
-			return false;
-		
-		LoggingUtil.logDebug(String.format("REJECT_ACCOUNT: Employee %s rejected user %s account %s",
-				employee.getUserName(), customerUserName, account.getNickName()));
-		
-		return true;
+
+		try {
+			accountDao.toggleActive(account.getId());
+			LoggingUtil.logDebug(String.format("REJECT_ACCOUNT: Employee %s successfully rejected user %s account %s",
+					employee.getUserName(), customer.getUserName(), account.getNickName()));
+		} catch (SQLException e) {
+			LoggingUtil.logError(String.format("REJECT_ACCOUNT: Employee %s unsuccessfully tried to reject user %s account %s (%s)",
+					employee.getUserName(), customer.getUserName(), account.getNickName(), e.getMessage()));
+		}
 	}
 }

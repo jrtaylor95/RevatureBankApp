@@ -2,12 +2,11 @@ package com.revature.bank.core;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Scanner;
 
 import com.revature.bank.accounts.Account;
@@ -27,7 +26,7 @@ public class BankDriver {
 	public static void main(String[] args) {
 		scanner = new Scanner(System.in);
 
-		bank = init();
+		bank = new Bank();
 
 		try {
 			while (run) {
@@ -128,11 +127,18 @@ public class BankDriver {
 	}
 
 	private static void viewCustomers() {
-		Collection<Customer> customers = bank.getCustomers();
+		Collection<Customer> customers = null;
+		try {
+			customers = bank.getCustomers();
+		} catch (SQLException e) {
+			System.out.println("Something went wrong! Please contact an admin.");
+		}
 
-		System.out.println("Customers");
-		for (Customer customer : customers) {
-			System.out.printf("Username: %s Name: %s %s", customer.getUserName(), customer.getFirstName(), customer.getLastName());
+		if (customers != null) {
+			System.out.println("Customers");
+			for (Customer customer : customers) {
+				System.out.printf("Username: %s Name: %s %s\n", customer.getUserName(), customer.getFirstName(), customer.getLastName());
+			}
 		}
 	}
 
@@ -143,138 +149,333 @@ public class BankDriver {
 		bank.apply((Customer) currentUser, accountName);
 	}
 
-	private static void approveAccount() throws SQLException {
+	private static void approveAccount() {
 		System.out.print("From user: ");
-		String user = scanner.next();
+		String userName = scanner.next();
 
-		bank.approveAccount((Employee) currentUser, user); 
+		Customer user;
+		try {
+			user = bank.getCustomer(userName);
+			List<Account> accounts = bank.getPendingAccounts(user);
+			
+			if (accounts.isEmpty()) {
+				System.out.printf("User %s has no pending accounts\n", user.getUserName());
+				return;
+			}
+			
+			for (int i = 0; i < accounts.size(); i++) {
+				System.out.printf("%d. %s\n", i, accounts.get(i).getNickName());
+			}
+
+			System.out.print("Choose Account: ");
+			int accountIdx = scanner.nextInt();
+			bank.approveAccount((Employee) currentUser, user, accounts.get(accountIdx)); 
+		} catch (SQLException e) {
+			System.out.println("Something went wrong! Please contact an admin.");
+		}
 	}
 
 	private static void rejectAccount() throws SQLException {
 		System.out.print("From user: ");
-		String user = scanner.next();
+		String userName = scanner.next();
 
-		bank.rejectAccount((Employee) currentUser, user);
+		Customer user;
+		try {
+			user = bank.getCustomer(userName);
+			List<Account> accounts = bank.getPendingAccounts(user);
+			
+			if (accounts.isEmpty()) {
+				System.out.printf("User %s has no pending accounts\n", user.getUserName());
+				return;
+			}
+			
+			for (int i = 0; i < accounts.size(); i++) {
+				System.out.printf("%d. %s\n", i, accounts.get(i).getNickName());
+			}
+
+			System.out.print("Choose Account: ");
+			int accountIdx = scanner.nextInt();
+			bank.rejectAccount((Employee) currentUser, user, accounts.get(accountIdx)); 
+		} catch (SQLException e) {
+			System.out.println("Something went wrong! Please contact an admin.");
+		}
 	}
 
 	private static void cancelAccount() throws SQLException {
 		System.out.print("From user: ");
-		String user = scanner.next();
+		String userName = scanner.next();
 
-		int idx = 0;
-		for (Account account: ((Customer) currentUser).getAccounts()) {
-			System.out.printf("%d." + account.toString(), ++idx);
+		Customer user;
+		try {
+			user = bank.getCustomer(userName);
+			List<Account> accounts = bank.getAccounts(user);
+			
+			if (accounts.isEmpty()) {
+				System.out.printf("User %s has no pending accounts\n", user.getUserName());
+				return;
+			}
+			
+			for (int i = 0; i < accounts.size(); i++) {
+				System.out.printf("%d. %s\n", i, accounts.get(i).getNickName());
+			}
+
+			System.out.print("Choose Account: ");
+			int accountIdx = scanner.nextInt();
+			bank.cancelAccount((Administrator) currentUser, user, accounts.get(accountIdx)); 
+		} catch (SQLException e) {
+			System.out.println("Something went wrong! Please contact an admin.");
 		}
-		int accountIdx = scanner.nextInt();
-
-		bank.cancelAccount((Administrator) currentUser, user, accountIdx);
 	}
 
 	private static void withdraw() {
+		Customer customer = (Customer) currentUser;
 		System.out.print("From account: \n");
-		int idx = 0;
-		for (Account account: ((Customer) currentUser).getAccounts()) {
-			System.out.printf("%d." + account.toString(), ++idx);
+		try {
+			List<Account> accounts = bank.getAccounts(customer);
+			
+			if (accounts.isEmpty()) {
+				System.out.println("You have no active accounts\n");
+				return;
+			}
+			
+			for (int i = 0; i < accounts.size(); i++) {
+				System.out.printf("%d. %s\n", i, accounts.get(i).getNickName());
+			}
+
+			System.out.print("Choose Account: ");
+			int accountIdx = scanner.nextInt();
+			System.out.print("Amount: $");
+			double amount = scanner.nextDouble();
+			bank.withdraw(customer, accounts.get(accountIdx), amount); 
+		} catch (SQLException e) {
+			System.out.println("Something went wrong! Please contact an admin.");
 		}
-		int option = scanner.nextInt() - 1;
-		System.out.println("Amount: ");
-		double amount = scanner.nextDouble();
-		bank.withdraw((Customer) currentUser, option, amount);
 	}
 
 	private static void withdrawAdmin() throws SQLException {
-		System.out.println("From user: ");
-		String user = scanner.next();
-		System.out.print("From account: ");
-		int option = scanner.nextInt() - 1;
-		System.out.println("Amount: ");
-		double amount = scanner.nextDouble();
-		bank.withdraw((Administrator) currentUser, user, option, amount);
+		Administrator admin = (Administrator) currentUser;
+
+		System.out.print("From customer: ");
+		String customerUserName = scanner.next();
+
+		try {
+			Customer customer = bank.getCustomer(customerUserName);
+
+			List<Account> accounts = bank.getAccounts(customer);
+			
+			if (accounts.isEmpty()) {
+				System.out.printf("User %s has no pending accounts\n", currentUser.getUserName());
+				return;
+			}
+			
+			for (int i = 0; i < accounts.size(); i++) {
+				System.out.printf("%d. %s\n", i, accounts.get(i).getNickName());
+			}
+
+			System.out.print("Choose Account: ");
+			int accountIdx = scanner.nextInt();
+			System.out.print("Amount: $");
+			double amount = scanner.nextDouble();
+			bank.withdraw(admin, customer, accounts.get(accountIdx), amount); 
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}
 	}
 
 	private static void deposit() {
 		System.out.print("From account: \n");
-		int idx = 0;
-		for (Account account: ((Customer) currentUser).getAccounts()) {
-			System.out.printf("%d." + account.toString(), ++idx);
+		Customer customer = (Customer) currentUser;
+		try {
+			List<Account> accounts = bank.getAccounts(customer);
+			
+			if (accounts.isEmpty()) {
+				System.out.println("You have no active accounts\n");
+				return;
+			}
+			
+			for (int i = 0; i < accounts.size(); i++) {
+				System.out.printf("%d. %s\n", i, accounts.get(i).getNickName());
+			}
+
+			System.out.print("Choose Account: ");
+			int accountIdx = scanner.nextInt();
+			System.out.print("Amount: $");
+			double amount = scanner.nextDouble();
+			bank.deposit(customer, accounts.get(accountIdx), amount); 
+		} catch (SQLException e) {
+			System.out.println("Something went wrong! Please contact an admin.");
 		}
-		int option = scanner.nextInt() - 1;
-		System.out.println("Amount: ");
-		double amount = scanner.nextDouble();
-		bank.deposit((Customer) currentUser, option, amount);
 	}
 
 	private static void depositAdmin() throws SQLException {
-		System.out.println("From user: ");
-		String user = scanner.next();
-		System.out.print("From account: ");
-		int option = scanner.nextInt() - 1;
-		System.out.println("Amount: ");
-		double amount = scanner.nextDouble();
-		bank.deposit((Administrator) currentUser, user, option, amount);
+		Administrator admin = (Administrator) currentUser;
+
+		System.out.print("From customer: ");
+		String customerUserName = scanner.next();
+
+		try {
+			Customer customer = bank.getCustomer(customerUserName);
+
+			List<Account> accounts = bank.getAccounts(customer);
+			
+			if (accounts.isEmpty()) {
+				System.out.printf("User %s has no pending accounts\n", customer.getUserName());
+				return;
+			}
+			
+			for (int i = 0; i < accounts.size(); i++) {
+				System.out.printf("%d. %s\n", i, accounts.get(i).getNickName());
+			}
+
+			System.out.print("Choose Account: ");
+			int accountIdx = scanner.nextInt();
+			System.out.print("Amount: $");
+			double amount = scanner.nextDouble();
+			bank.deposit(admin, customer, accounts.get(accountIdx), amount); 
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}
 	}
 
 	private static void transferBetweenAccounts() {
-		int idx = 0;
-		for (Account account: ((Customer) currentUser).getAccounts()) {
-			System.out.printf("%d." + account.toString(), ++idx);
+		System.out.print("From account: \n");
+		Customer customer = (Customer) currentUser;
+		try {
+			List<Account> accounts = bank.getAccounts(customer);
+			
+			if (accounts.isEmpty()) {
+				System.out.println("You have no active accounts\n");
+				return;
+			}
+			
+			for (int i = 0; i < accounts.size(); i++) {
+				System.out.printf("%d. %s\n", i, accounts.get(i).getNickName());
+			}
+
+			System.out.print("From Account: ");
+			int fromAccountIdx = scanner.nextInt();
+			System.out.print("To Account: ");
+			int toAccountIdx = scanner.nextInt();
+			System.out.print("Amount: $");
+			double amount = scanner.nextDouble();
+			bank.transfer(customer, accounts.get(fromAccountIdx), accounts.get(toAccountIdx), amount); 
+		} catch (SQLException e) {
+			System.out.println("Something went wrong! Please contact an admin.");
 		}
-		System.out.print("From account: ");
-		int fromAccount = scanner.nextInt() - 1;
-		System.out.print("To account: ");
-		int toAccount = scanner.nextInt() - 1;
-		System.out.println("Amount: ");
-		double amount = scanner.nextDouble();
-		bank.transfer((Customer) currentUser, fromAccount, toAccount, amount);
 	}
 
 	private static void transferBetweenAccountsAdmin() throws SQLException {
-		System.out.println("From user: ");
-		String user = scanner.next();
-		System.out.print("From account: ");
-		int fromAccount = scanner.nextInt() - 1;
-		System.out.print("To account: ");
-		int toAccount = scanner.nextInt() - 1;
-		System.out.println("Amount: ");
-		double amount = scanner.nextDouble();
-		bank.transfer((Administrator) currentUser, user, fromAccount, toAccount, amount);
+		Administrator admin = (Administrator) currentUser;
+
+		System.out.print("From customer: ");
+		String customerUserName = scanner.next();
+
+		try {
+			Customer customer = bank.getCustomer(customerUserName);
+
+			List<Account> accounts = bank.getAccounts(customer);
+			
+			if (accounts.isEmpty()) {
+				System.out.printf("User %s has no pending accounts\n", customer.getUserName());
+				return;
+			}
+			
+			for (int i = 0; i < accounts.size(); i++) {
+				System.out.printf("%d. %s\n", i, accounts.get(i).getNickName());
+			}
+
+			System.out.print("From Account: ");
+			int fromAccountIdx = scanner.nextInt();
+			System.out.print("To Account: ");
+			int toAccountIdx = scanner.nextInt();
+			System.out.print("Amount: $");
+			double amount = scanner.nextDouble();
+			bank.transfer(admin, customer, accounts.get(fromAccountIdx), accounts.get(toAccountIdx), amount);
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}
 	}
 
 	private static void transferBetweenUsers() throws SQLException {
-		int idx = 0;
-		for (Account account: ((Customer) currentUser).getAccounts()) {
-			System.out.printf("%d." + account.toString(), ++idx);
-		}
-		System.out.print("From account: ");
-		int fromAccount = scanner.nextInt() - 1;
-		System.out.print("To user: ");
-		String toUser = scanner.next();
-		System.out.print("To account: ");
-		int toAccount = scanner.nextInt() - 1;
-		System.out.println("Amount: ");
-		double amount = scanner.nextDouble();
+		Customer fromCustomer = (Customer) currentUser;
 
 		try {
-			bank.transfer((Customer) currentUser, fromAccount, toUser, toAccount, amount);
-		} catch (IllegalArgumentException e) {
-			System.out.println("Invalid command!");
-			transferBetweenUsers();
+			List<Account> accounts = bank.getAccounts(fromCustomer);
+			if (accounts.isEmpty()) {
+				System.out.println("You have no accounts");
+				return;
+			}
+			
+			for (int i = 0; i < accounts.size(); i++) {
+				System.out.printf("%d. %s\n", i, accounts.get(i).getNickName());
+			}
+
+			System.out.print("From Account: ");
+			int fromAccountIdx = scanner.nextInt();
+			
+			System.out.print("To customer: ");
+			String toCustomerUserName = scanner.next();
+			Customer toCustomer = bank.getCustomer(toCustomerUserName);
+			List<Account> toAccounts = bank.getAccounts(toCustomer);
+			if (accounts.isEmpty()) {
+				System.out.printf("User %s has no pending accounts\n", toCustomer.getUserName());
+				return;
+			}
+			for (int i = 0; i < accounts.size(); i++) {
+				System.out.printf("%d. %s\n", i, accounts.get(i).getNickName());
+			}
+
+			System.out.print("To Account: ");
+			int toAccountIdx = scanner.nextInt();
+			System.out.print("Amount: $");
+			double amount = scanner.nextDouble();
+			bank.transfer(fromCustomer, accounts.get(fromAccountIdx), toCustomer, toAccounts.get(toAccountIdx), amount);
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
 		}
 	}
 
 	private static void transferBetweenUsersAdmin() throws SQLException {
-		System.out.println("From user: ");
-		String user = scanner.next();
-		System.out.print("From account: ");
-		int fromAccount = scanner.nextInt() - 1;
-		System.out.print("To user: ");
-		String toUser = scanner.next();
-		System.out.print("To account: ");
-		int toAccount = scanner.nextInt() - 1;
-		System.out.println("Amount: ");
-		double amount = scanner.nextDouble();
+		Administrator admin = (Administrator) currentUser;
 
-		bank.transfer((Administrator) currentUser, user, fromAccount, toUser, toAccount, amount);
+		System.out.print("From customer: ");
+		String fromCustomerUserName = scanner.next();
+
+		try {
+			Customer fromCustomer = bank.getCustomer(fromCustomerUserName);
+
+			List<Account> accounts = bank.getAccounts(fromCustomer);
+			if (accounts.isEmpty()) {
+				System.out.printf("User %s has no pending accounts\n", fromCustomer.getUserName());
+				return;
+			}
+			for (int i = 0; i < accounts.size(); i++) {
+				System.out.printf("%d. %s\n", i, accounts.get(i).getNickName());
+			}
+
+			System.out.print("From Account: ");
+			int fromAccountIdx = scanner.nextInt();
+			
+			System.out.print("To customer: ");
+			String toCustomerUserName = scanner.next();
+			Customer toCustomer = bank.getCustomer(toCustomerUserName);
+			List<Account> toAccounts = bank.getAccounts(toCustomer);
+			if (accounts.isEmpty()) {
+				System.out.printf("User %s has no pending accounts\n", toCustomer.getUserName());
+				return;
+			}
+			for (int i = 0; i < accounts.size(); i++) {
+				System.out.printf("%d. %s\n", i, accounts.get(i).getNickName());
+			}
+
+			System.out.print("To Account: ");
+			int toAccountIdx = scanner.nextInt();
+			System.out.print("Amount: $");
+			double amount = scanner.nextDouble();
+			bank.transfer(admin, fromCustomer, accounts.get(fromAccountIdx), toCustomer, toAccounts.get(toAccountIdx), amount);
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}
 	}
 
 	private static Bank init() {
@@ -299,15 +500,15 @@ public class BankDriver {
 	}
 
 	private static void exit() {
-		try (ObjectOutputStream stream = new ObjectOutputStream(new FileOutputStream("bank.dat"))) {
-			stream.writeObject(bank);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		try (ObjectOutputStream stream = new ObjectOutputStream(new FileOutputStream("bank.dat"))) {
+//			stream.writeObject(bank);
+//		} catch (FileNotFoundException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		run = false;
 	}
 
@@ -336,7 +537,15 @@ public class BankDriver {
 		System.out.println("Password: ");
 		String password = scanner.next();
 
-		return bank.logon(userName, password);
+		User user = null;
+		
+		try {
+			user = bank.logon(userName, password);
+		} catch (SQLException e) {
+			System.out.println("Something went wrong!");
+		}
+		
+		return user;
 	}
 
 	private static User register(boolean isEmployee) throws SQLException {

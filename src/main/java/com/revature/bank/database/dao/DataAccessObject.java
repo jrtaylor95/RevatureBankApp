@@ -3,7 +3,7 @@ package com.revature.bank.database.dao;
 import java.sql.SQLException;
 import java.util.List;
 
-public interface BankDao<T> {
+public interface DataAccessObject<T> {
 	public void create(T t) throws SQLException;
 	
 	public T select(int id) throws SQLException;
